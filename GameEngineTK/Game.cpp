@@ -38,6 +38,7 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
 
+	// テクチャ関連
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
 
 	m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
@@ -57,6 +58,12 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 
 	// デバックカメラの生成
 	m_debugCamera = std::make_unique<DebugCamera>(m_outputWidth, m_outputHeight);
+
+	// モデル関連
+	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
+	m_factory->SetDirectory(L"Resources");
+	m_modelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground1m.cmo", *m_factory);
+	m_modelSkyDome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skyDome.cmo", *m_factory);
 }
 
 // Executes the basic game loop.
@@ -97,10 +104,10 @@ void Game::Render()	// 描画
 	VertexPositionNormal vertices[] =
 	{
 		// 座標　　　　　　　　　　　法線ベクトル
-		{Vector3(-1.0f,1.0f,0.0f),Vector3(0.0f,0.0f,1.0f)},
-		{Vector3(-1.0f,-1.0f,0.0f),Vector3(0.0f,0.0f,1.0f)},
-		{Vector3(1.0f,1.0f,0.0f),Vector3(0.0f,0.0f,1.0f)},
-		{Vector3(1.0f,-1.0f,0.0f),Vector3(0.0f,0.0f,1.0f)},
+		{Vector3(-0.5f,0.5f,0.0f),Vector3(0.0f,0.0f,1.0f)},
+		{Vector3(-0.5f,-0.5f,0.0f),Vector3(0.0f,0.0f,1.0f)},
+		{Vector3(0.5f,0.5f,0.0f),Vector3(0.0f,0.0f,1.0f)},
+		{Vector3(0.5f,-0.5f,0.0f),Vector3(0.0f,0.0f,1.0f)},
 	};
 
     // Don't try to render anything before the first Update.
@@ -125,7 +132,7 @@ void Game::Render()	// 描画
 	m_view = m_debugCamera->GetCameraMatrix();
 	// 描画範囲を指定(後半２つの数値が描画範囲）第一引数は視野角 第二引数は画面の比率
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
-		float(m_outputWidth) / float(m_outputHeight), 0.1f, 100.f);
+		float(m_outputWidth) / float(m_outputHeight), 0.1f, 200.f);
 
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
@@ -133,6 +140,8 @@ void Game::Render()	// 描画
 	m_effect->Apply(m_d3dContext.Get());
 	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
 
+
+	// テクスチャ、ポリゴンモデルの描画
 	m_batch->Begin();
 
 	//m_batch->DrawLine(VertexPositionColor(Vector3(0.0f, 0.0f, 0.0f), Colors::Red),
@@ -147,6 +156,10 @@ void Game::Render()	// 描画
 	m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
 
 	m_batch->End();
+
+	// 天球、地面モデルの描画
+	m_modelSkyDome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	m_modelGround->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
 
     Present();
 }

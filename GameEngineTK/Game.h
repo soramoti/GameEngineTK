@@ -12,6 +12,8 @@
 #include <Effects.h>
 #include <CommonStates.h>
 
+#include <Model.h>
+
 #include "DebugCamera.h"
 
 // A basic game implementation that creates a D3D11 device and
@@ -70,7 +72,7 @@ private:
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
 
-	// 変数宣言
+	// テクスチャ関連の変数
 	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>> m_batch;
 	std::unique_ptr<DirectX::BasicEffect> m_effect;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
@@ -83,4 +85,9 @@ private:
 
 	// デバックカメラ
 	std::unique_ptr<DebugCamera> m_debugCamera;
+
+	// モデル関連の変数
+	std::unique_ptr<DirectX::EffectFactory> m_factory;
+	std::unique_ptr<DirectX::Model> m_modelSkyDome;
+	std::unique_ptr<DirectX::Model> m_modelGround;
 };
