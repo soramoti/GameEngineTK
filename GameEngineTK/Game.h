@@ -82,6 +82,10 @@ private:
 	DirectX::SimpleMath::Matrix m_world;
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
+	// 球モデル用のワールド行列	
+	DirectX::SimpleMath::Matrix m_worldSphere[20];
+	// 床モデル用のワールド行列
+	//DirectX::SimpleMath::Matrix m_worldGround[40000];
 
 	// デバックカメラ
 	std::unique_ptr<DebugCamera> m_debugCamera;
@@ -90,4 +94,8 @@ private:
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
 	std::unique_ptr<DirectX::Model> m_modelSkyDome;
 	std::unique_ptr<DirectX::Model> m_modelGround;
+	std::unique_ptr<DirectX::Model> m_modelSphere[20];
+	//std::unique_ptr<DirectX::Model> m_modelGround2[40000];
+
+	float rightRota, leftRota;
 };

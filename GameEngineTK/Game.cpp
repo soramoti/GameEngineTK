@@ -38,7 +38,7 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
 
-	// テクチャ関連
+	// テクチャ関連 =========
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
 
 	m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
@@ -56,14 +56,29 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 			shaderByteCode, byteCodeLength,
 			m_inputLayout.GetAddressOf());
 
-	// デバックカメラの生成
+	// デバックカメラの生成 ========
 	m_debugCamera = std::make_unique<DebugCamera>(m_outputWidth, m_outputHeight);
 
-	// モデル関連
+	// モデル関連 =======
 	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
 	m_factory->SetDirectory(L"Resources");
 	m_modelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground1m.cmo", *m_factory);
 	m_modelSkyDome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skyDome.cmo", *m_factory);
+	for (int i = 0; i < 20; i++)
+	{
+		m_modelSphere[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/sphere.cmo", *m_factory);
+	}
+	//for (int i = 0; i < 40000; i++)
+	//{
+	//	m_modelGround2[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground1m.cmo", *m_factory);
+
+	//	Matrix transmat = Matrix::CreateTranslation(i % 200 - 100 ,0.0f, i / 200 - 100);
+
+	//	m_worldGround[i] = transmat;
+	//}
+
+	rightRota = 0.0f;
+	leftRota = 0.0f;
 }
 
 // Executes the basic game loop.
@@ -88,6 +103,38 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 
 	// デバックカメラの更新
 	m_debugCamera->Update();
+
+	// 球のワールド行列の計算 =======
+	leftRota -= 1.0f;
+	rightRota += 1.0f;
+
+	// スケーリング
+	//Matrix scalemat = Matrix::CreateScale(0.5f);
+	// 回転
+	//Matrix rotmatZ = Matrix::CreateRotationZ(XMConvertToRadians(15.0f));	// ロール(Z軸回転)
+	//Matrix rotmatX = Matrix::CreateRotationX(XMConvertToRadians(15.0f));	// ピッチ(仰角)(X軸回転)
+
+	for (int i = 0; i < 20; i++)
+	{
+		if(i <= 9)
+		{
+			Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(i * 36.0f + rightRota));	// ヨー(方位角)(Y軸回転)
+			// 平行移動
+			Matrix transmat = Matrix::CreateTranslation(20.0f, 0.0f, 0.0f);
+			
+			// ワールド行列の合成
+			m_worldSphere[i] = transmat * rotmatY;
+		}
+		else
+		{
+			Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(i * 36.0f + leftRota));	// ヨー(方位角)(Y軸回転)
+			// 平行移動
+			Matrix transmat = Matrix::CreateTranslation(40.0f, 0.0f, 0.0f);
+
+			// ワールド行列の合成
+			m_worldSphere[i] = transmat * rotmatY;
+		}
+	}
 }
 
 // Draws the scene.
@@ -125,6 +172,7 @@ void Game::Render()	// 描画
 	m_d3dContext->OMSetDepthStencilState(m_states->DepthNone(), 0);
 	m_d3dContext->RSSetState(m_states->CullNone());
 
+	// 座標関連 ========
 	//// 第一引数はカメラの位置、第二引数は注視点、第三引数はカメラの方向
 	//m_view = Matrix::CreateLookAt(Vector3(0.0f, 2.0f, 2.0f),
 	//	Vector3::Zero, Vector3::UnitY);	//::Zeroは(0.0f,0.0f,0.0f)、::UnitYは(0.0f,1.0f,0.0f)を示しているunitは単位
@@ -141,8 +189,20 @@ void Game::Render()	// 描画
 	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
 
 
-	// テクスチャ、ポリゴンモデルの描画
-	m_batch->Begin();
+	// 天球、地面モデルの描画 ==========
+	m_modelSkyDome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	m_modelGround->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	//for (int i = 0; i < 40000; i++)
+	//{
+	//	m_modelGround2[i]->Draw(m_d3dContext.Get(), *m_states, m_worldGround[i], m_view, m_proj);
+	//}
+	for (int i = 0; i < 20; i++)
+	{
+		m_modelSphere[i]->Draw(m_d3dContext.Get(), *m_states, m_worldSphere[i], m_view, m_proj);
+	}
+
+	// テクスチャ、ポリゴンモデルの描画 ==========
+	//m_batch->Begin();
 
 	//m_batch->DrawLine(VertexPositionColor(Vector3(0.0f, 0.0f, 0.0f), Colors::Red),
 	//	VertexPositionColor(Vector3(800.0f, 600.0f, 0.0f), Colors::White));
@@ -153,13 +213,10 @@ void Game::Render()	// 描画
 
 	//m_batch->DrawTriangle(v1, v2, v3);
 
-	m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
+	//m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
 
-	m_batch->End();
+	//m_batch->End();
 
-	// 天球、地面モデルの描画
-	m_modelSkyDome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
-	m_modelGround->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
 
     Present();
 }
