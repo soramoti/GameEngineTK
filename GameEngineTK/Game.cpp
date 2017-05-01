@@ -62,7 +62,7 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 	// モデル関連 =======
 	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
 	m_factory->SetDirectory(L"Resources");
-	m_modelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground1m.cmo", *m_factory);
+	m_modelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground200m.cmo", *m_factory);
 	m_modelSkyDome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skyDome.cmo", *m_factory);
 	for (int i = 0; i < 20; i++)
 	{
@@ -190,8 +190,8 @@ void Game::Render()	// 描画
 
 
 	// 天球、地面モデルの描画 ==========
-	m_modelSkyDome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
-	m_modelGround->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	m_modelSkyDome->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
+	m_modelGround->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
 	//for (int i = 0; i < 40000; i++)
 	//{
 	//	m_modelGround2[i]->Draw(m_d3dContext.Get(), *m_states, m_worldGround[i], m_view, m_proj);
