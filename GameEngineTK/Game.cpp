@@ -5,6 +5,9 @@
 #include "pch.h"
 #include "Game.h"
 
+#include <iostream>
+#include <ctime>
+
 extern void ExitGame();
 
 using namespace DirectX;
@@ -38,6 +41,10 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
 
+	m_keyboard = std::make_unique<Keyboard>();
+
+	srand(static_cast<unsigned int>(time(nullptr)));
+
 	// テクチャ関連 =========
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
 
@@ -67,18 +74,19 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 	for (int i = 0; i < 20; i++)
 	{
 		m_modelSphere[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/sphere.cmo", *m_factory);
+		m_modelTeapot[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/teapot.cmo", *m_factory);
+
+		x[i] = rand() % 200 - 100;
+		z[i] = rand() % 200 - 100;
 	}
-	//for (int i = 0; i < 40000; i++)
-	//{
-	//	m_modelGround2[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground1m.cmo", *m_factory);
 
-	//	Matrix transmat = Matrix::CreateTranslation(i % 200 - 100 ,0.0f, i / 200 - 100);
-
-	//	m_worldGround[i] = transmat;
-	//}
+	m_modelRobbot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/robbot.cmo", *m_factory);
 
 	rightRota = 0.0f;
 	leftRota = 0.0f;
+	vel = 0.0f;
+
+	robbotRota = 0.0f;
 }
 
 // Executes the basic game loop.
@@ -107,34 +115,91 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	// 球のワールド行列の計算 =======
 	leftRota -= 1.0f;
 	rightRota += 1.0f;
+	//if (vel <= 0.0f)
+	//{
+	//	vel += 0.01f;
+	//}
+	//if (vel >= 5.0f)
+	//{
+	//	vel -= 0.01f;
+	//}
 
-	// スケーリング
-	//Matrix scalemat = Matrix::CreateScale(0.5f);
 	// 回転
 	//Matrix rotmatZ = Matrix::CreateRotationZ(XMConvertToRadians(15.0f));	// ロール(Z軸回転)
 	//Matrix rotmatX = Matrix::CreateRotationX(XMConvertToRadians(15.0f));	// ピッチ(仰角)(X軸回転)
 
 	for (int i = 0; i < 20; i++)
 	{
-		if(i <= 9)
-		{
-			Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(i * 36.0f + rightRota));	// ヨー(方位角)(Y軸回転)
-			// 平行移動
-			Matrix transmat = Matrix::CreateTranslation(20.0f, 0.0f, 0.0f);
-			
-			// ワールド行列の合成
-			m_worldSphere[i] = transmat * rotmatY;
-		}
-		else
-		{
-			Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(i * 36.0f + leftRota));	// ヨー(方位角)(Y軸回転)
-			// 平行移動
-			Matrix transmat = Matrix::CreateTranslation(40.0f, 0.0f, 0.0f);
+		//// 球用のワールド行列の更新
+		//if(i <= 9)
+		//{
+		//	Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(i * 36.0f + rightRota));	// ヨー(方位角)(Y軸回転)
+		//	 平行移動
+		//	Matrix transmat = Matrix::CreateTranslation(20.0f, 0.0f, 0.0f);
+		//	
+		//	// ワールド行列の合成
+		//	m_worldSphere[i] = transmat * rotmatY;
+		//}
+		//else
+		//{
+		//	Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(i * 36.0f + leftRota));	// ヨー(方位角)(Y軸回転)
+		//	// 平行移動
+		//	Matrix transmat = Matrix::CreateTranslation(40.0f, 0.0f, 0.0f);
 
-			// ワールド行列の合成
-			m_worldSphere[i] = transmat * rotmatY;
-		}
+		//	// ワールド行列の合成
+		//	m_worldSphere[i] = transmat * rotmatY;
+		//}
+
+		// ティーポット用のワールド行列の更新
+		// スケーリング
+		Matrix scalemat = Matrix::CreateScale(0.5f);
+			
+		Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(rightRota));	// ヨー(方位角)(Y軸回転)
+
+		Matrix transmat = Matrix::CreateTranslation(x[i], 0.0f, z[i]);
+
+		m_worldTeapot[i] = scalemat * rotmatY * transmat;
+
 	}
+
+	// キーボードの状態を取得する
+	Keyboard::State key = m_keyboard->GetState();
+
+	if (key.A)
+	{
+		robbotRota += 1.0f;
+	}
+	if (key.D)
+	{
+		robbotRota -= 1.0f;
+	}
+
+	if (key.W)
+	{
+		// 移動ベクトル
+		Vector3 move(0.0f, 0.0f, -0.1f);
+		// 今の角度に合わせて移動ベクトルを回転させる===========
+		// ワールド行列を移動ベクトルにかける
+		//move = Vector3::TransformNormal(move, m_worldRobbot);
+		// 回転行列を移動ベクトルにかける
+		Matrix rotation = Matrix::CreateRotationY(XMConvertToRadians(robbotRota));
+		move = Vector3::TransformNormal(move, rotation);
+		// 自機の座標を移動
+		robbotPos += move;
+	}
+	if (key.S)
+	{
+		Vector3 move(0.0f, 0.0f, 0.1f);
+		Matrix rotation = Matrix::CreateRotationY(XMConvertToRadians(robbotRota));
+		move = Vector3::TransformNormal(move, rotation);
+		robbotPos += move;
+	}
+
+	// 自機のワールド行列を計算==========
+	Matrix rotation = Matrix::CreateRotationY(XMConvertToRadians(robbotRota));
+	Matrix transrate = Matrix::CreateTranslation(robbotPos);
+	m_worldRobbot = rotation * transrate;
+
 }
 
 // Draws the scene.
@@ -180,7 +245,7 @@ void Game::Render()	// 描画
 	m_view = m_debugCamera->GetCameraMatrix();
 	// 描画範囲を指定(後半２つの数値が描画範囲）第一引数は視野角 第二引数は画面の比率
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
-		float(m_outputWidth) / float(m_outputHeight), 0.1f, 200.f);
+		float(m_outputWidth) / float(m_outputHeight), 0.1f, 500.f);
 
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
@@ -192,14 +257,13 @@ void Game::Render()	// 描画
 	// 天球、地面モデルの描画 ==========
 	m_modelSkyDome->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
 	m_modelGround->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
-	//for (int i = 0; i < 40000; i++)
-	//{
-	//	m_modelGround2[i]->Draw(m_d3dContext.Get(), *m_states, m_worldGround[i], m_view, m_proj);
-	//}
 	for (int i = 0; i < 20; i++)
 	{
-		m_modelSphere[i]->Draw(m_d3dContext.Get(), *m_states, m_worldSphere[i], m_view, m_proj);
+		//m_modelSphere[i]->Draw(m_d3dContext.Get(), *m_states, m_worldSphere[i], m_view, m_proj);
+		m_modelTeapot[i]->Draw(m_d3dContext.Get(), *m_states, m_worldTeapot[i], m_view, m_proj);
 	}
+
+	m_modelRobbot->Draw(m_d3dContext.Get(), *m_states, m_worldRobbot, m_view, m_proj);
 
 	// テクスチャ、ポリゴンモデルの描画 ==========
 	//m_batch->Begin();

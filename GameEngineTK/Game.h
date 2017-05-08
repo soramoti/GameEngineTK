@@ -6,6 +6,8 @@
 
 #include "StepTimer.h"
 
+#include <Keyboard.h>
+
 #include <SimpleMath.h>
 #include <PrimitiveBatch.h>
 #include <VertexTypes.h>
@@ -72,6 +74,9 @@ private:
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
 
+	//　キーボードの変数
+	std::unique_ptr <DirectX::Keyboard> m_keyboard;
+
 	// テクスチャ関連の変数
 	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>> m_batch;
 	std::unique_ptr<DirectX::BasicEffect> m_effect;
@@ -84,18 +89,29 @@ private:
 	DirectX::SimpleMath::Matrix m_proj;
 	// 球モデル用のワールド行列	
 	DirectX::SimpleMath::Matrix m_worldSphere[20];
-	// 床モデル用のワールド行列
-	//DirectX::SimpleMath::Matrix m_worldGround[40000];
+	// ティーポット用のワールド行列
+	DirectX::SimpleMath::Matrix m_worldTeapot[20];
+	// 自機用のワールド行列
+	DirectX::SimpleMath::Matrix m_worldRobbot;
 
 	// デバックカメラ
 	std::unique_ptr<DebugCamera> m_debugCamera;
 
 	// モデル関連の変数
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
+
 	std::unique_ptr<DirectX::Model> m_modelSkyDome;
 	std::unique_ptr<DirectX::Model> m_modelGround;
 	std::unique_ptr<DirectX::Model> m_modelSphere[20];
-	//std::unique_ptr<DirectX::Model> m_modelGround2[40000];
+	std::unique_ptr<DirectX::Model> m_modelTeapot[20];
+
+	std::unique_ptr<DirectX::Model> m_modelRobbot;
 
 	float rightRota, leftRota;
+	int x[20], z[20];
+	float vel;
+
+	// 自機の座標を保持する変数
+	DirectX::SimpleMath::Vector3 robbotPos;
+	float robbotRota;
 };
