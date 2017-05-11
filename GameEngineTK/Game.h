@@ -17,6 +17,7 @@
 #include <Model.h>
 
 #include "DebugCamera.h"
+#include "Camera.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -114,4 +115,6 @@ private:
 	// ©‹@‚ÌÀ•W‚ğ•Û‚·‚é•Ï”
 	DirectX::SimpleMath::Vector3 robbotPos;
 	float robbotRota;
+
+	std::unique_ptr<Camera> m_camera;
 };

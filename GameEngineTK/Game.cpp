@@ -82,6 +82,8 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 
 	m_modelRobbot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/robbot.cmo", *m_factory);
 
+	m_camera = std::make_unique<Camera>(m_outputWidth, m_outputHeight);
+
 	rightRota = 0.0f;
 	leftRota = 0.0f;
 	vel = 0.0f;
@@ -200,6 +202,12 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	Matrix transrate = Matrix::CreateTranslation(robbotPos);
 	m_worldRobbot = rotation * transrate;
 
+	m_camera->SetEyePos(robbotPos);
+	m_camera->SetRefPos(Vector3(0, 0,100));
+	m_camera->Update();
+	m_view = m_camera->GetVeiwMatrix();
+	m_proj = m_camera->GetProjMatrix();
+
 }
 
 // Draws the scene.
@@ -237,15 +245,14 @@ void Game::Render()	// 描画
 	m_d3dContext->OMSetDepthStencilState(m_states->DepthNone(), 0);
 	m_d3dContext->RSSetState(m_states->CullNone());
 
-	// 座標関連 ========
+	// カメラ,座標関連 ========
 	//// 第一引数はカメラの位置、第二引数は注視点、第三引数はカメラの方向
 	//m_view = Matrix::CreateLookAt(Vector3(0.0f, 2.0f, 2.0f),
 	//	Vector3::Zero, Vector3::UnitY);	//::Zeroは(0.0f,0.0f,0.0f)、::UnitYは(0.0f,1.0f,0.0f)を示しているunitは単位
 	// デバックカメラからビュー行列を取得
-	m_view = m_debugCamera->GetCameraMatrix();
+	//m_view = m_debugCamera->GetCameraMatrix();
 	// 描画範囲を指定(後半２つの数値が描画範囲）第一引数は視野角 第二引数は画面の比率
-	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
-		float(m_outputWidth) / float(m_outputHeight), 0.1f, 500.f);
+	//m_proj = Matrix::CreatePerspectiveFieldOfView(fovY, aspect, nearclip, farclip);
 
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
