@@ -82,11 +82,10 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 
 	m_modelRobbot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/robbot.cmo", *m_factory);
 
-	m_camera = std::make_unique<Camera>(m_outputWidth, m_outputHeight);
+	m_camera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
 
 	rightRota = 0.0f;
 	leftRota = 0.0f;
-	vel = 0.0f;
 
 	robbotRota = 0.0f;
 }
@@ -117,14 +116,6 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	// 球のワールド行列の計算 =======
 	leftRota -= 1.0f;
 	rightRota += 1.0f;
-	//if (vel <= 0.0f)
-	//{
-	//	vel += 0.01f;
-	//}
-	//if (vel >= 5.0f)
-	//{
-	//	vel -= 0.01f;
-	//}
 
 	// 回転
 	//Matrix rotmatZ = Matrix::CreateRotationZ(XMConvertToRadians(15.0f));	// ロール(Z軸回転)
@@ -202,12 +193,13 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	Matrix transrate = Matrix::CreateTranslation(robbotPos);
 	m_worldRobbot = rotation * transrate;
 
-	m_camera->SetEyePos(robbotPos);
-	m_camera->SetRefPos(Vector3(0, 0,100));
-	m_camera->Update();
-	m_view = m_camera->GetVeiwMatrix();
-	m_proj = m_camera->GetProjMatrix();
+	// カメラ
+	m_camera->SetTargetPos(robbotPos);
+	m_camera->SetTargetAngle(robbotRota);
 
+	m_camera->Update();
+	m_view = m_camera->GetVeiw();
+	m_proj = m_camera->GetProj();
 }
 
 // Draws the scene.

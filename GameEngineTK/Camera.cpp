@@ -1,7 +1,16 @@
+//ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+//概要　
+//
+//日付　
+//
+//制作　Mai Kudo
+//ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+
 #include "Camera.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
+
 //==================================
 //*関数の概要　コンストラクタ
 //*引数[int,int] 画面の縦、横のサイズ
@@ -54,7 +63,7 @@ void Camera::Update()
 //*引数[]
 //*戻り値　ビュー行列
 //==================================
-DirectX::SimpleMath::Matrix Camera::GetVeiwMatrix()
+const DirectX::SimpleMath::Matrix& Camera::GetVeiw()
 {
 	return m_view;
 }
@@ -64,7 +73,7 @@ DirectX::SimpleMath::Matrix Camera::GetVeiwMatrix()
 //*引数[]
 //*戻り値　射影行列
 //==================================
-DirectX::SimpleMath::Matrix Camera::GetProjMatrix()
+const DirectX::SimpleMath::Matrix& Camera::GetProj()
 {
 	return m_proj;
 }
@@ -74,7 +83,7 @@ DirectX::SimpleMath::Matrix Camera::GetProjMatrix()
 //*引数[Vector3]　視点座標
 //*戻り値
 //==================================
-void Camera::SetEyePos(DirectX::SimpleMath::Vector3 eyepos)
+void Camera::SetEyePos(const DirectX::SimpleMath::Vector3& eyepos)
 {
 	m_eyepos = eyepos;
 }
@@ -84,7 +93,7 @@ void Camera::SetEyePos(DirectX::SimpleMath::Vector3 eyepos)
 //*引数[Vector3]　注視点座標
 //*戻り値
 //==================================
-void Camera::SetRefPos(DirectX::SimpleMath::Vector3 refpos)
+void Camera::SetRefPos(const DirectX::SimpleMath::Vector3& refpos)
 {
 	m_refpos = refpos;
 }
@@ -94,7 +103,7 @@ void Camera::SetRefPos(DirectX::SimpleMath::Vector3 refpos)
 //*引数[Vector3]　上方向ベクトル
 //*戻り値
 //==================================
-void Camera::SetUpVec(DirectX::SimpleMath::Vector3 upvec)
+void Camera::SetUpVec(const DirectX::SimpleMath::Vector3& upvec)
 {
 	m_upvec = upvec;
 }

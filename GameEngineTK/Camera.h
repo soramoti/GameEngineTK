@@ -1,5 +1,5 @@
 //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
-//概要　カメラを制御するクラス
+//概要　カメラを制御するクラスヘッダ
 //
 //日付　2017/05/11
 //
@@ -12,23 +12,23 @@
 
 class Camera
 {
-public:	// メンバ関数
+public:
 	Camera(int width, int height);
 	virtual ~Camera();
 	// 更新処理
-	void Update();
+	virtual void Update();
 
 	// ビュー行列を取得
-	DirectX::SimpleMath::Matrix GetVeiwMatrix();
+	const DirectX::SimpleMath::Matrix& GetVeiw();
 	// 射影行列を取得
-	DirectX::SimpleMath::Matrix GetProjMatrix();
+	const DirectX::SimpleMath::Matrix& GetProj();
 
 	// 視点座標をセット
-	void SetEyePos(DirectX::SimpleMath::Vector3 eyepos);
+	void SetEyePos(const DirectX::SimpleMath::Vector3& eyepos);
 	// 注視点/参照点をセット
-	void SetRefPos(DirectX::SimpleMath::Vector3 refpos);
+	void SetRefPos(const DirectX::SimpleMath::Vector3& refpos);
 	// 上方向ベクトルをセット
-	void SetUpVec(DirectX::SimpleMath::Vector3 upvec);
+	void SetUpVec(const DirectX::SimpleMath::Vector3& upvec);
 	//　垂直方向視野角をセット
 	void SetFovY(float fovY);
 	// アスペクト比をセット
@@ -38,7 +38,7 @@ public:	// メンバ関数
 	// 奥の表示限界をセット
 	void SetFarClip(float farclip);
 
-protected:	// メンバ変数
+protected:
 	DirectX::SimpleMath::Matrix m_view;		// ビュー行列
 	DirectX::SimpleMath::Matrix m_proj;		// 射影行列
 	
