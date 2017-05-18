@@ -82,7 +82,9 @@ void Game::Initialize(HWND window, int width, int height)	// ‰Šú‰»
 
 	m_modelRobbot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/robbot.cmo", *m_factory);
 
+	// ƒJƒƒ‰‚Ì¶¬
 	m_camera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
+	m_camera->SetKeyboard(m_keyboard.get());
 
 	rightRota = 0.0f;
 	leftRota = 0.0f;
