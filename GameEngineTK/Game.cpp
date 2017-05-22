@@ -43,6 +43,13 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 
 	m_keyboard = std::make_unique<Keyboard>();
 
+	// カメラの生成
+	m_camera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
+	m_camera->SetKeyboard(m_keyboard.get());
+
+	// 3Dオブジェくトクラスの静的メンバの初期化
+	Obj3D::InitializeStatic(m_camera.get(), m_d3dDevice, m_d3dContext);
+
 	srand(static_cast<unsigned int>(time(nullptr)));
 
 	// テクチャ関連 =========
@@ -64,7 +71,7 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 			m_inputLayout.GetAddressOf());
 
 	// デバックカメラの生成 ========
-	m_debugCamera = std::make_unique<DebugCamera>(m_outputWidth, m_outputHeight);
+	//m_debugCamera = std::make_unique<DebugCamera>(m_outputWidth, m_outputHeight);
 
 	// モデル関連 =======
 	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
@@ -79,12 +86,6 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 		x[i] = rand() % 200 - 100;
 		z[i] = rand() % 200 - 100;
 	}
-
-	m_modelRobbot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/robbot.cmo", *m_factory);
-
-	// カメラの生成
-	m_camera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
-	m_camera->SetKeyboard(m_keyboard.get());
 
 	rightRota = 0.0f;
 	leftRota = 0.0f;
@@ -113,7 +114,7 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	// ゲームの毎フレーム処理
 
 	// デバックカメラの更新
-	m_debugCamera->Update();
+	//m_debugCamera->Update();
 
 	// 球のワールド行列の計算 =======
 	leftRota -= 1.0f;
@@ -193,7 +194,11 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	// 自機のワールド行列を計算==========
 	Matrix rotation = Matrix::CreateRotationY(XMConvertToRadians(robbotRota));
 	Matrix transrate = Matrix::CreateTranslation(robbotPos);
-	m_worldRobbot = rotation * transrate;
+	//m_worldRobbot = rotation * transrate;
+
+	// パーツ１からの平行移動
+	Matrix transrate2 = Matrix::CreateTranslation(Vector3(0.0f, 0.5f, 0.0f));
+	//m_worldRobbot2 = transrate2 * m_worldRobbot;
 
 	// カメラ
 	m_camera->SetTargetPos(robbotPos);
@@ -264,7 +269,9 @@ void Game::Render()	// 描画
 		m_modelTeapot[i]->Draw(m_d3dContext.Get(), *m_states, m_worldTeapot[i], m_view, m_proj);
 	}
 
-	m_modelRobbot->Draw(m_d3dContext.Get(), *m_states, m_worldRobbot, m_view, m_proj);
+	// ロボの描画
+	//m_modelRobbot->Draw(m_d3dContext.Get(), *m_states, m_worldRobbot, m_view, m_proj);
+	//m_modelRobbot->Draw(m_d3dContext.Get(), *m_states, m_worldRobbot2, m_view, m_proj);
 
 	// テクスチャ、ポリゴンモデルの描画 ==========
 	//m_batch->Begin();

@@ -19,6 +19,8 @@
 #include "DebugCamera.h"
 #include "FollowCamera.h"
 
+#include "Obj3D.h"
+
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
 class Game
@@ -85,18 +87,16 @@ private:
 	std::unique_ptr<DirectX::CommonStates> m_states;
 
 	// 行列座標
-	DirectX::SimpleMath::Matrix m_world;
+	//DirectX::SimpleMath::Matrix m_world;
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
 	// 球モデル用のワールド行列	
-	DirectX::SimpleMath::Matrix m_worldSphere[20];
+	//DirectX::SimpleMath::Matrix m_worldSphere[20];
 	// ティーポット用のワールド行列
 	DirectX::SimpleMath::Matrix m_worldTeapot[20];
-	// 自機用のワールド行列
-	DirectX::SimpleMath::Matrix m_worldRobbot;
 
 	// デバックカメラ
-	std::unique_ptr<DebugCamera> m_debugCamera;
+	//std::unique_ptr<DebugCamera> m_debugCamera;
 
 	// モデル関連の変数
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
@@ -106,7 +106,8 @@ private:
 	std::unique_ptr<DirectX::Model> m_modelSphere[20];
 	std::unique_ptr<DirectX::Model> m_modelTeapot[20];
 
-	std::unique_ptr<DirectX::Model> m_modelRobbot;
+	Obj3D m_objPlayer1;		// プレイヤー親パーツ
+	Obj3D m_objPlayer2;		// プレイヤー子パーツ１
 
 	float rightRota, leftRota;
 	int x[20], z[20];
