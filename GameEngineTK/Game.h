@@ -27,6 +27,17 @@ class Game
 {
 public:
 
+	enum PLAYER_PARTS
+	{
+		PLAYER_PARTS_TANK,
+		PLAYER_PARTS_BODY,
+		PLAYER_PARTS_HEAD,
+		PLAYER_PARTS_ARM,
+		PLAYER_PARTS_GUN,
+
+		PLAYER_PARTS_NUM,
+	};
+
     Game();
 
     // Initialization and management
@@ -90,10 +101,6 @@ private:
 	//DirectX::SimpleMath::Matrix m_world;
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
-	// 球モデル用のワールド行列	
-	//DirectX::SimpleMath::Matrix m_worldSphere[20];
-	// ティーポット用のワールド行列
-	DirectX::SimpleMath::Matrix m_worldTeapot[20];
 
 	// デバックカメラ
 	//std::unique_ptr<DebugCamera> m_debugCamera;
@@ -101,15 +108,13 @@ private:
 	// モデル関連の変数
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
 
-	std::unique_ptr<DirectX::Model> m_modelSkyDome;
-	std::unique_ptr<DirectX::Model> m_modelGround;
-	std::unique_ptr<DirectX::Model> m_modelSphere[20];
-	std::unique_ptr<DirectX::Model> m_modelTeapot[20];
+    Obj3D m_objSkyDome;
+	Obj3D m_objGround;
+	Obj3D m_objTeapot[20];
 
-	Obj3D m_objPlayer1;		// プレイヤー親パーツ
-	Obj3D m_objPlayer2;		// プレイヤー子パーツ１
+	std::vector<Obj3D> m_objPlayer;		// プレイヤー
 
-	float rightRota, leftRota;
+	float rightRota;
 	int x[20], z[20];
 
 	// 自機の座標を保持する変数

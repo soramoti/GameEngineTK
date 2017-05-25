@@ -46,27 +46,28 @@ public:
 	void Update();
 	void Render();
 
-	// setter(スケーリング用、回転用、平行移動用)
-	void SetScale(DirectX::SimpleMath::Vector3 scale);
-	void SetRotation(float rotation);
-	void SetTransration(DirectX::SimpleMath::Vector3 transration);
-
-	// getter(スケーリング用、回転用、平行移動用、ワールド行列)
-	DirectX::SimpleMath::Vector3 GetScale();
-	float GetRotation();
-	DirectX::SimpleMath::Vector3 GetTransration();
-	DirectX::SimpleMath::Matrix GetWorld();
+	// setter(スケーリング用、回転用、平行移動用、親オブジェクト用)
+	void SetScale(const DirectX::SimpleMath::Vector3& scale) { m_scale = scale; }
+	void SetRotation(const DirectX::SimpleMath::Vector3& rotation){ m_rotation = rotation; }
+	void SetTransration(const DirectX::SimpleMath::Vector3& transration){ m_transration = transration; }
+	void SetObjParent(Obj3D* objParent) { m_objParent = objParent; }
+	// getter(スケーリング用、回転用、平行移動用、ワールド行列、親オブジェクト用)
+	const DirectX::SimpleMath::Vector3 GetScale() { return m_scale; }
+	const DirectX::SimpleMath::Vector3 GetRotation() { return m_rotation; }
+	const DirectX::SimpleMath::Vector3 GetTransration() { return m_transration; }
+	const DirectX::SimpleMath::Matrix GetWorld() { return m_world; }
+	Obj3D* GetObjParent() { return m_objParent; }
 private:
 	// 3Dモデルのユニークポインタ
 	std::unique_ptr<DirectX::Model> m_model;
 	// スケーリング
 	DirectX::SimpleMath::Vector3 m_scale;
 	// 回転
-	float m_rotation;
+	DirectX::SimpleMath::Vector3 m_rotation;
 	// 平行移動
 	DirectX::SimpleMath::Vector3 m_transration;
 	// ワールド行列
 	DirectX::SimpleMath::Matrix m_world;
 	// 親となる3Dオブジェクトクラスのポインタ
-	Obj3D* m_obj;
+	Obj3D* m_objParent;
 };

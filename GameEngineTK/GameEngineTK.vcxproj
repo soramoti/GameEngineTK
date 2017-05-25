@@ -201,6 +201,10 @@
     <MeshContentTask Include="Assets\ground1m.FBX" />
     <MeshContentTask Include="Assets\ground200m.FBX" />
     <MeshContentTask Include="Assets\robbot.FBX" />
+    <MeshContentTask Include="Assets\robbot2.FBX" />
+    <MeshContentTask Include="Assets\robbot3.FBX" />
+    <MeshContentTask Include="Assets\robbot4.FBX" />
+    <MeshContentTask Include="Assets\robbot5.FBX" />
     <MeshContentTask Include="Assets\skyDome.FBX" />
     <MeshContentTask Include="Assets\sphere.FBX" />
     <MeshContentTask Include="Assets\teapot.FBX" />

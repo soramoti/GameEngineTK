@@ -76,19 +76,23 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 	// モデル関連 =======
 	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
 	m_factory->SetDirectory(L"Resources");
-	m_modelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground200m.cmo", *m_factory);
-	m_modelSkyDome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skyDome.cmo", *m_factory);
+	m_objGround.LoadModel(L"Resources/ground200m.cmo");
+	m_objSkyDome.LoadModel(L"Resources/skyDome.cmo");
 	for (int i = 0; i < 20; i++)
 	{
-		m_modelSphere[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/sphere.cmo", *m_factory);
-		m_modelTeapot[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/teapot.cmo", *m_factory);
-
+		m_objTeapot[i].LoadModel(L"Resources/teapot.cmo");
 		x[i] = rand() % 200 - 100;
 		z[i] = rand() % 200 - 100;
 	}
+	
+	m_objPlayer.resize(PLAYER_PARTS_NUM);
+	m_objPlayer[PLAYER_PARTS_TANK].LoadModel(L"Resources/robbot.cmo");
+	m_objPlayer[PLAYER_PARTS_BODY].LoadModel(L"Resources/robbot2.cmo");
+	m_objPlayer[PLAYER_PARTS_HEAD].LoadModel(L"Resources/robbot3.cmo");
+	m_objPlayer[PLAYER_PARTS_ARM].LoadModel(L"Resources/robbot4.cmo");
+	m_objPlayer[PLAYER_PARTS_GUN].LoadModel(L"Resources/robbot5.cmo");
 
 	rightRota = 0.0f;
-	leftRota = 0.0f;
 
 	robbotRota = 0.0f;
 }
@@ -117,8 +121,7 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	//m_debugCamera->Update();
 
 	// 球のワールド行列の計算 =======
-	leftRota -= 1.0f;
-	rightRota += 1.0f;
+	rightRota += 0.1f;
 
 	// 回転
 	//Matrix rotmatZ = Matrix::CreateRotationZ(XMConvertToRadians(15.0f));	// ロール(Z軸回転)
@@ -126,36 +129,11 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 
 	for (int i = 0; i < 20; i++)
 	{
-		//// 球用のワールド行列の更新
-		//if(i <= 9)
-		//{
-		//	Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(i * 36.0f + rightRota));	// ヨー(方位角)(Y軸回転)
-		//	 平行移動
-		//	Matrix transmat = Matrix::CreateTranslation(20.0f, 0.0f, 0.0f);
-		//	
-		//	// ワールド行列の合成
-		//	m_worldSphere[i] = transmat * rotmatY;
-		//}
-		//else
-		//{
-		//	Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(i * 36.0f + leftRota));	// ヨー(方位角)(Y軸回転)
-		//	// 平行移動
-		//	Matrix transmat = Matrix::CreateTranslation(40.0f, 0.0f, 0.0f);
-
-		//	// ワールド行列の合成
-		//	m_worldSphere[i] = transmat * rotmatY;
-		//}
-
 		// ティーポット用のワールド行列の更新
-		// スケーリング
-		Matrix scalemat = Matrix::CreateScale(0.5f);
-			
-		Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(rightRota));	// ヨー(方位角)(Y軸回転)
-
-		Matrix transmat = Matrix::CreateTranslation(x[i], 0.0f, z[i]);
-
-		m_worldTeapot[i] = scalemat * rotmatY * transmat;
-
+		m_objTeapot[i].SetScale(Vector3(0.5f, 0.5f, 0.5f));
+		m_objTeapot[i].SetRotation(Vector3(0.0f, rightRota, 0.0f));
+		m_objTeapot[i].SetTransration(Vector3(x[i], 0.0f, z[i]));
+		m_objTeapot[i].Update();
 	}
 
 	// キーボードの状態を取得する
@@ -207,6 +185,8 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	m_camera->Update();
 	m_view = m_camera->GetVeiw();
 	m_proj = m_camera->GetProj();
+
+	m_objSkyDome.Update();
 }
 
 // Draws the scene.
@@ -261,18 +241,18 @@ void Game::Render()	// 描画
 
 
 	// 天球、地面モデルの描画 ==========
-	m_modelSkyDome->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
-	m_modelGround->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
+	m_objSkyDome.Render();
+	m_objGround.Render();
 	for (int i = 0; i < 20; i++)
 	{
-		//m_modelSphere[i]->Draw(m_d3dContext.Get(), *m_states, m_worldSphere[i], m_view, m_proj);
-		m_modelTeapot[i]->Draw(m_d3dContext.Get(), *m_states, m_worldTeapot[i], m_view, m_proj);
+		m_objTeapot[i].Render();
 	}
 
 	// ロボの描画
-	//m_modelRobbot->Draw(m_d3dContext.Get(), *m_states, m_worldRobbot, m_view, m_proj);
-	//m_modelRobbot->Draw(m_d3dContext.Get(), *m_states, m_worldRobbot2, m_view, m_proj);
-
+	for (std::vector<Obj3D>::iterator it = m_objPlayer.begin(); it != m_objPlayer.end(); it++)
+	{
+		it->Render();
+	}
 	// テクスチャ、ポリゴンモデルの描画 ==========
 	//m_batch->Begin();
 

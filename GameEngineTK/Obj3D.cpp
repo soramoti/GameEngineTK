@@ -29,52 +29,39 @@ void Obj3D::InitializeStatic(Camera * pCamera, Microsoft::WRL::ComPtr<ID3D11Devi
 
 Obj3D::Obj3D()
 {
-
+	m_scale = Vector3(1.0f, 1.0f, 1.0f);
+	m_objParent = nullptr;
 }
 
 void Obj3D::LoadModel(const wchar_t * fileName)
 {
+	m_model = Model::CreateFromCMO(m_d3dDevice.Get(), fileName, *m_factory);
 }
 
 void Obj3D::Update()
 {
+	// 行列を計算する処理=======
+	// スケーリング行列
+	Matrix scaling = Matrix::CreateScale(m_scale);
+	// 回転行列
+	Matrix rotaZ = Matrix::CreateRotationZ(m_rotation.z);
+	Matrix rotaX = Matrix::CreateRotationX(m_rotation.x);
+	Matrix rotaY = Matrix::CreateRotationY(m_rotation.y);
+	Matrix rotation = rotaZ * rotaX * rotaY;
+	// 平行移動行列
+	Matrix transrate = Matrix::CreateTranslation(m_transration);
+	// ワールド行列を合成
+	m_world = scaling * rotation * transrate;
+	if (m_objParent)
+	{
+		m_world *= m_objParent->GetWorld();
+	}
 }
 
 void Obj3D::Render()
 {
-}
-
-void Obj3D::SetScale(DirectX::SimpleMath::Vector3 scale)
-{
-	m_scale = scale;
-}
-
-void Obj3D::SetRotation(float rotation)
-{
-	m_rotation = rotation;
-}
-
-void Obj3D::SetTransration(DirectX::SimpleMath::Vector3 transration)
-{
-	m_transration = transration;
-}
-
-DirectX::SimpleMath::Vector3 Obj3D::GetScale()
-{
-	return m_scale;
-}
-
-float Obj3D::GetRotation()
-{
-	return m_rotation;
-}
-
-DirectX::SimpleMath::Vector3 Obj3D::GetTransration()
-{
-	return m_transration;
-}
-
-DirectX::SimpleMath::Matrix Obj3D::GetWorld()
-{
-	return m_world;
+	if (m_model)
+	{
+		m_model->Draw(m_d3dContext.Get(), *m_states, m_world, m_pCamera->GetVeiw(), m_pCamera->GetProj());
+	}
 }
