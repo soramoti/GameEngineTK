@@ -29,11 +29,16 @@ public:
 
 	enum PLAYER_PARTS
 	{
-		PLAYER_PARTS_TANK,
 		PLAYER_PARTS_BODY,
+		PLAYER_PARTS_FRFOOT,
+		PLAYER_PARTS_FLFOOT,
+		PLAYER_PARTS_BRFOOT,
+		PLAYER_PARTS_BLFOOT,
 		PLAYER_PARTS_HEAD,
-		PLAYER_PARTS_ARM,
-		PLAYER_PARTS_GUN,
+		PLAYER_PARTS_RWING,
+		PLAYER_PARTS_LWING,
+		PLAYER_PARTS_TAIL,
+		PLAYER_PARTS_STAR,
 
 		PLAYER_PARTS_NUM,
 	};
@@ -102,6 +107,8 @@ private:
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
 
+	DirectX::SimpleMath::Matrix m_starWorld;
+
 	// デバックカメラ
 	//std::unique_ptr<DebugCamera> m_debugCamera;
 
@@ -114,12 +121,21 @@ private:
 
 	std::vector<Obj3D> m_objPlayer;		// プレイヤー
 
-	float rightRota;
+	float m_angle;
 	int x[20], z[20];
 
-	// 自機の座標を保持する変数
-	DirectX::SimpleMath::Vector3 robbotPos;
-	float robbotRota;
+	int timeCnt;
+
+	float m_cycle;
+	float m_wingPcycle;
+	float m_wingNcycle;
+
+	float red;
+
+	DirectX::SimpleMath::Vector3 pos;
+	DirectX::SimpleMath::Vector3 RwingRota;
+	DirectX::SimpleMath::Vector3 LwingRota;
+	DirectX::SimpleMath::Vector3 tailRota;
 
 	std::unique_ptr<FollowCamera> m_camera;
 };

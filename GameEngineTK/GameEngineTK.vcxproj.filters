@@ -56,16 +56,25 @@
     <MeshContentTask Include="Assets\robbot.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
-    <MeshContentTask Include="Assets\robbot2.FBX">
+    <MeshContentTask Include="Assets\body.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
-    <MeshContentTask Include="Assets\robbot3.FBX">
+    <MeshContentTask Include="Assets\engin.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
-    <MeshContentTask Include="Assets\robbot4.FBX">
+    <MeshContentTask Include="Assets\foot.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
-    <MeshContentTask Include="Assets\robbot5.FBX">
+    <MeshContentTask Include="Assets\head.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\star.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\tail.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\wing.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
   </ItemGroup>

@@ -51,6 +51,7 @@ public:
 	void SetRotation(const DirectX::SimpleMath::Vector3& rotation){ m_rotation = rotation; }
 	void SetTransration(const DirectX::SimpleMath::Vector3& transration){ m_transration = transration; }
 	void SetObjParent(Obj3D* objParent) { m_objParent = objParent; }
+	void SetWorld(const DirectX::SimpleMath::Matrix& world) { m_world = world; }
 	// getter(スケーリング用、回転用、平行移動用、ワールド行列、親オブジェクト用)
 	const DirectX::SimpleMath::Vector3 GetScale() { return m_scale; }
 	const DirectX::SimpleMath::Vector3 GetRotation() { return m_rotation; }
