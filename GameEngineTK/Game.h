@@ -20,28 +20,13 @@
 #include "FollowCamera.h"
 
 #include "Obj3D.h"
+#include "Player.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
 class Game
 {
 public:
-
-	enum PLAYER_PARTS
-	{
-		PLAYER_PARTS_BODY,
-		PLAYER_PARTS_FRFOOT,
-		PLAYER_PARTS_FLFOOT,
-		PLAYER_PARTS_BRFOOT,
-		PLAYER_PARTS_BLFOOT,
-		PLAYER_PARTS_HEAD,
-		PLAYER_PARTS_RWING,
-		PLAYER_PARTS_LWING,
-		PLAYER_PARTS_TAIL,
-		PLAYER_PARTS_STAR,
-
-		PLAYER_PARTS_NUM,
-	};
 
     Game();
 
@@ -119,23 +104,14 @@ private:
 	Obj3D m_objGround;
 	Obj3D m_objTeapot[20];
 
-	std::vector<Obj3D> m_objPlayer;		// ÉvÉåÉCÉÑÅ[
+	std::unique_ptr<Player> m_player;
 
 	float m_angle;
 	int x[20], z[20];
 
-	int timeCnt;
-
 	float m_cycle;
 	float m_wingPcycle;
 	float m_wingNcycle;
-
-	float red;
-
-	DirectX::SimpleMath::Vector3 pos;
-	DirectX::SimpleMath::Vector3 RwingRota;
-	DirectX::SimpleMath::Vector3 LwingRota;
-	DirectX::SimpleMath::Vector3 tailRota;
 
 	std::unique_ptr<FollowCamera> m_camera;
 };
