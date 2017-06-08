@@ -6,7 +6,7 @@
 
 #include "Obj3D.h"
 
-class Player
+class Enemy
 {
 public:
 	enum PARTS
@@ -26,27 +26,21 @@ public:
 	};
 
 public:
-	Player();
-	~Player();
+	Enemy();
+	~Enemy();
 
 	void Initiarize();
 	void Update();
 	void Rebder();
 
-	// キーボードをセットする（仮）
-	void SetKeyboard(DirectX::Keyboard* keyboard);
-
 	void SetPos(const DirectX::SimpleMath::Vector3& pos) { m_obj[BODY].SetTransration(pos); }
-	void SetAngle(const DirectX::SimpleMath::Vector3& angle) { m_obj[BODY].SetTransration(angle); }
+	void SetAngle(const DirectX::SimpleMath::Vector3& angle) { m_obj[BODY].SetRotation(angle); }
 
-	const DirectX::SimpleMath::Vector3& GetPos(){ return m_obj[BODY].GetTransration(); }
+	const DirectX::SimpleMath::Vector3& GetPos(){return m_obj[BODY].GetTransration();}
 	const DirectX::SimpleMath::Vector3& GetAngle() { return m_obj[BODY].GetRotation(); }
 
 private:
-	// キーボード（仮）
-	DirectX::Keyboard* m_keyboard;
-
-	std::vector<Obj3D> m_obj;		// プレイヤー
+	std::vector<Obj3D> m_obj;
 
 	float m_angle;
 
@@ -59,5 +53,7 @@ private:
 	DirectX::SimpleMath::Vector3 m_LwingRota;
 	DirectX::SimpleMath::Vector3 m_tailRota;
 
+	int m_timer;
+	float m_distAngle;
 };
 

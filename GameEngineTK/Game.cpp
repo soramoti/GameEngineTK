@@ -40,6 +40,7 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
+	//srand(static_cast<unsigned int>(time(nullptr)));
 
 	m_keyboard = std::make_unique<Keyboard>();
 
@@ -50,44 +51,56 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 	// 3Dオブジェくトクラスの静的メンバの初期化
 	Obj3D::InitializeStatic(m_camera.get(), m_d3dDevice, m_d3dContext);
 
-	srand(static_cast<unsigned int>(time(nullptr)));
 
 	// テクチャ関連 =========
-	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
+	//m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
 
-	m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
+	//m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
 
-	m_effect->SetProjection(XMMatrixOrthographicOffCenterRH(0, m_outputWidth, m_outputHeight, 0, 0, 1));
-	m_effect->SetVertexColorEnabled(true);
+	//m_effect->SetProjection(XMMatrixOrthographicOffCenterRH(0, m_outputWidth, m_outputHeight, 0, 0, 1));
+	//m_effect->SetVertexColorEnabled(true);
 
-	void const* shaderByteCode;
-	size_t byteCodeLength;
+	//void const* shaderByteCode;
+	//size_t byteCodeLength;
 
-	m_effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+	//m_effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
-	m_d3dDevice->CreateInputLayout(VertexPositionColor::InputElements,
-			VertexPositionColor::InputElementCount,
-			shaderByteCode, byteCodeLength,
-			m_inputLayout.GetAddressOf());
+	//m_d3dDevice->CreateInputLayout(VertexPositionColor::InputElements,
+	//		VertexPositionColor::InputElementCount,
+	//		shaderByteCode, byteCodeLength,
+	//		m_inputLayout.GetAddressOf());
 
 	// デバックカメラの生成 ========
 	//m_debugCamera = std::make_unique<DebugCamera>(m_outputWidth, m_outputHeight);
 
 	// モデル関連 =======
-	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
-	m_factory->SetDirectory(L"Resources");
+	//m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
+	//m_factory->SetDirectory(L"Resources");
 	m_objGround.LoadModel(L"Resources/ground200m.cmo");
 	m_objSkyDome.LoadModel(L"Resources/skyDome.cmo");
-	for (int i = 0; i < 20; i++)
-	{
-		m_objTeapot[i].LoadModel(L"Resources/teapot.cmo");
-		x[i] = rand() % 200 - 100;
-		z[i] = rand() % 200 - 100;
-	}
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	m_objTeapot[i].LoadModel(L"Resources/teapot.cmo");
+	//	x[i] = rand() % 200 - 100;
+	//	z[i] = rand() % 200 - 100;
+	//}
 	
+	// プレイヤを生成
 	m_player = std::make_unique<Player>();
 	m_player->SetKeyboard(m_keyboard.get());
 	m_player->Initiarize();
+	// 追従カメラをプレイヤにセット
+	m_camera->SetPlayer(m_player.get());
+
+	// 敵を生成
+	int enemyNum = rand() % 10 + 1;
+	m_enemy.resize(enemyNum);
+	for (int i = 0; i < enemyNum; i++)
+	{
+		m_enemy[i] = std::make_unique<Enemy>();
+		m_enemy[i]->Initiarize();
+	}
+
 
 	m_angle = 0.0f;
 
@@ -116,27 +129,39 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	// デバックカメラの更新
 	//m_debugCamera->Update();
 
-	// 球のワールド行列の計算 =======
+	// キーボードの状態を取得する
+	Keyboard::State key = m_keyboard->GetState();
+
+	// ワールド行列の計算 =======
 	m_angle += 0.05f;
 
-	for (int i = 0; i < 20; i++)
-	{
-		// ティーポット用のワールド行列の更新
-		m_objTeapot[i].SetScale(Vector3(0.5f, 0.5f, 0.5f));
-		m_objTeapot[i].SetRotation(Vector3(0.0f, m_angle, 0.0f));
-		m_objTeapot[i].SetTransration(Vector3(x[i], 0.0f, z[i]));
-		m_objTeapot[i].Update();
-	}
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	// ティーポット用のワールド行列の更新
+	//	m_objTeapot[i].SetScale(Vector3(0.5f, 0.5f, 0.5f));
+	//	m_objTeapot[i].SetRotation(Vector3(0.0f, m_angle, 0.0f));
+	//	m_objTeapot[i].SetTransration(Vector3(x[i], 0.0f, z[i]));
+	//	m_objTeapot[i].Update();
+	//}
 
 	m_player->Update();
 
-	// カメラ
-	m_camera->SetTargetPos(m_player->GetPos());
-	m_camera->SetTargetAngle(m_player->GetAngle().y);
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_enemy.begin();
+		it != m_enemy.end();
+		it++)
+	{
+		 //デバックしやすい
+		Enemy* enemy = it->get();
+		enemy->Update();
 
+		// 短く書ける
+		//(*it)->Update();
+	}
+
+	// カメラ
 	m_camera->Update();
-	m_view = m_camera->GetVeiw();
-	m_proj = m_camera->GetProj();
+	//m_view = m_camera->GetVeiw();
+	//m_proj = m_camera->GetProj();
 
 
 	m_objSkyDome.Update();
@@ -146,23 +171,6 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 // Draws the scene.
 void Game::Render()	// 描画
 {
-	// 頂点インデックス配列
-	uint16_t indices[] =
-	{
-		0,1,2,
-		2,1,3
-	};
-
-	// 頂点データ配列
-	VertexPositionNormal vertices[] =
-	{
-		// 座標　　　　　　　　　　　法線ベクトル
-		{Vector3(-0.5f,0.5f,0.0f),Vector3(0.0f,0.0f,1.0f)},
-		{Vector3(-0.5f,-0.5f,0.0f),Vector3(0.0f,0.0f,1.0f)},
-		{Vector3(0.5f,0.5f,0.0f),Vector3(0.0f,0.0f,1.0f)},
-		{Vector3(0.5f,-0.5f,0.0f),Vector3(0.0f,0.0f,1.0f)},
-	};
-
     // Don't try to render anything before the first Update.
     if (m_timer.GetFrameCount() == 0)
     {
@@ -173,10 +181,10 @@ void Game::Render()	// 描画
 
     // TODO: Add your rendering code here.
 	// 描画はここから
-	m_states = std::make_unique<CommonStates>(m_d3dDevice.Get());
-	m_d3dContext->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-	m_d3dContext->OMSetDepthStencilState(m_states->DepthNone(), 0);
-	m_d3dContext->RSSetState(m_states->CullNone());
+	//m_states = std::make_unique<CommonStates>(m_d3dDevice.Get());
+	//m_d3dContext->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
+	//m_d3dContext->OMSetDepthStencilState(m_states->DepthNone(), 0);
+	//m_d3dContext->RSSetState(m_states->CullNone());
 
 	// カメラ,座標関連 ========
 	//// 第一引数はカメラの位置、第二引数は注視点、第三引数はカメラの方向
@@ -187,23 +195,33 @@ void Game::Render()	// 描画
 	//// 描画範囲を指定(後半２つの数値が描画範囲）第一引数は視野角 第二引数は画面の比率
 	//m_proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(60.0f), float(m_outputWidth) / m_outputHeight, 0.1f, 1000.0f);
 
-	m_effect->SetView(m_view);
-	m_effect->SetProjection(m_proj);
+	//m_effect->SetView(m_view);
+	//m_effect->SetProjection(m_proj);
 
-	m_effect->Apply(m_d3dContext.Get());
-	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
+	//m_effect->Apply(m_d3dContext.Get());
+	//m_d3dContext->IASetInputLayout(m_inputLayout.Get());
 
 
 	// 天球、地面モデルの描画 ==========
 	m_objSkyDome.Render();
 	m_objGround.Render();
-	for (int i = 0; i < 20; i++)
-	{
-		m_objTeapot[i].Render();
-	}
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	m_objTeapot[i].Render();
+	//}
 
 	m_player->Rebder();
 	
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_enemy.begin();
+		it != m_enemy.end();
+		it++)
+	{
+		Enemy* enemy = it->get();
+		enemy->Rebder();
+
+		//(*it)->Rebder();
+	}
+
 
 	// テクスチャ、ポリゴンモデルの描画 ==========
 	//m_batch->Begin();

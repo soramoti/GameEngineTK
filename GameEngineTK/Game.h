@@ -21,6 +21,7 @@
 
 #include "Obj3D.h"
 #include "Player.h"
+#include "Enemy.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -82,36 +83,31 @@ private:
 	std::unique_ptr <DirectX::Keyboard> m_keyboard;
 
 	// テクスチャ関連の変数
-	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>> m_batch;
-	std::unique_ptr<DirectX::BasicEffect> m_effect;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
-	std::unique_ptr<DirectX::CommonStates> m_states;
+	//std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>> m_batch;
+	//std::unique_ptr<DirectX::BasicEffect> m_effect;
+	//Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
+	//std::unique_ptr<DirectX::CommonStates> m_states;
 
 	// 行列座標
 	//DirectX::SimpleMath::Matrix m_world;
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
 
-	DirectX::SimpleMath::Matrix m_starWorld;
-
 	// デバックカメラ
 	//std::unique_ptr<DebugCamera> m_debugCamera;
 
 	// モデル関連の変数
-	std::unique_ptr<DirectX::EffectFactory> m_factory;
+	//std::unique_ptr<DirectX::EffectFactory> m_factory;
 
     Obj3D m_objSkyDome;
 	Obj3D m_objGround;
-	Obj3D m_objTeapot[20];
+	//Obj3D m_objTeapot[20];
 
-	std::unique_ptr<Player> m_player;
+	std::unique_ptr<Player> m_player;	// プレイヤ
+	std::vector<std::unique_ptr<Enemy>> m_enemy;
 
 	float m_angle;
 	int x[20], z[20];
-
-	float m_cycle;
-	float m_wingPcycle;
-	float m_wingNcycle;
 
 	std::unique_ptr<FollowCamera> m_camera;
 };

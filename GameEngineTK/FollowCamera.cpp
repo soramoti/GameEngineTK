@@ -38,6 +38,11 @@ void FollowCamera::Update()
 		}
 	}
 
+	// 追従対象の座標の設定
+	SetTargetPos(m_player->GetPos());
+	SetTargetAngle(m_player->GetAngle().y);
+
+
 	if (m_keyflag == 0)
 	{
 		 //TPS視点=====
@@ -46,7 +51,7 @@ void FollowCamera::Update()
 		// 参照点から視点への差分
 		Vector3 cameraV(0.0f, 0.0f, CAMERA_DISTANCE);
 		// 自機の後ろに回り込むための回転
-		Matrix rotation = Matrix::CreateRotationY(XMConvertToRadians(m_targetAngle));
+		Matrix rotation = Matrix::CreateRotationY(m_targetAngle);
 		// 差分ベクトルを回転
 		cameraV = Vector3::TransformNormal(cameraV, rotation);
 		// 視点座標を計算
@@ -66,7 +71,7 @@ void FollowCamera::Update()
 		// 参照点から視点への差分
 		Vector3 cameraV(0.0f, 0.0f, -CAMERA_DISTANCE);
 		// 自機の後ろに回り込むための回転
-		Matrix rotation = Matrix::CreateRotationY(XMConvertToRadians(m_targetAngle));
+		Matrix rotation = Matrix::CreateRotationY(m_targetAngle);
 		// 差分ベクトルを回転
 		cameraV = Vector3::TransformNormal(cameraV, rotation);
 		eyepos = upEyepos + cameraV * 0.1f;

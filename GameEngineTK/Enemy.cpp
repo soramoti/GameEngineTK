@@ -1,11 +1,13 @@
-#include "Player.h"
+#include "Enemy.h"
+
+#include <iostream>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
-Player::Player()
+Enemy::Enemy()
 {
 	m_angle = 0.0f;
 
@@ -13,18 +15,19 @@ Player::Player()
 	m_wingPcycle = 0.0f;
 	m_wingNcycle = 0.0f;
 
-	m_keyboard = nullptr;
-
+	m_timer = 0;
+	m_distAngle = 0;
 }
 
 
-Player::~Player()
+Enemy::~Enemy()
 {
 
 }
 
-void Player::Initiarize()
+void Enemy::Initiarize()
 {
+
 	// プレイヤーパーツのロード
 	m_obj.resize(NUM);
 	m_obj[FRFOOT].LoadModel(L"Resources/foot.cmo");
@@ -94,60 +97,84 @@ void Player::Initiarize()
 	m_RwingRota = m_obj[RWING].GetRotation();
 	m_LwingRota = m_obj[LWING].GetRotation();
 
+	//　初期位置をランダムに決める
+	Vector3 pos;
+
+	pos.x = rand() % 10;
+	pos.z = rand() % 10;
+
+	SetPos(pos);
 }
 
-void Player::Update()
+void Enemy::Update()
 {
 	m_angle += 0.05f;
 	m_cycle += 0.05;
 	m_wingPcycle += 0.1;
 	m_wingNcycle -= 0.1;
 
-	// キーボードの状態を取得する
-	Keyboard::State key = m_keyboard->GetState();
 
-	if (key.A)
+	m_timer--;
+	if (m_timer < 0)
 	{
-		float angleX = m_obj[BODY].GetRotation().x;
-		float angleY = m_obj[BODY].GetRotation().y;
-		m_obj[BODY].SetRotation(Vector3(angleX, angleY + 0.03f, 0.0f));
-	}
-	if (key.D)
-	{
-		float angleX = m_obj[BODY].GetRotation().x;
-		float angleY = m_obj[BODY].GetRotation().y;
-		m_obj[BODY].SetRotation(Vector3(angleX, angleY - 0.03f, 0.0f));
+		m_timer = 60;
+
+		// -0.5～0.5の乱数
+		float num = (float)rand() / RAND_MAX - 0.5f;
+		// -90～90の乱数
+		num *= 180.0f;
+
+		num = XMConvertToRadians(num);
+
+		m_distAngle += num;
 	}
 
-	if (key.W)
+	Vector3 rot = GetAngle();
+
+	float angle = m_distAngle - rot.y;
+
+	if (angle > XM_PI)
 	{
-		// 移動ベクトル
-		Vector3 move(0.0f, 0.0f, -0.1f);
-		// 今の角度に合わせて移動ベクトルを回転させる===========
-		// ワールド行列を移動ベクトルにかける
-		//move = Vector3::TransformNormal(move, m_worldRobbot);
-		// 回転行列を移動ベクトルにかける
-		float angle = m_obj[BODY].GetRotation().y;
-		Matrix rotation = Matrix::CreateRotationY(angle);
-		move = Vector3::TransformNormal(move, rotation);
-		// 自機の座標を移動
-		m_pos = m_obj[BODY].GetTransration();
-		m_pos += move;
-		m_obj[BODY].SetTransration(m_pos);
+		angle -= XM_2PI;
 	}
-	if (key.S)
+	if (angle < -XM_PI)
 	{
-		// 移動ベクトル
-		Vector3 move(0, 0, 0.1f);
-		// 回転行列
-		float angle = m_obj[BODY].GetRotation().y;
-		Matrix rotmat = Matrix::CreateRotationY(angle);
-		move = Vector3::TransformNormal(move, rotmat);
-		// 自機の座標を移動
-		m_pos = m_obj[BODY].GetTransration();
-		m_pos += move;
-		m_obj[BODY].SetTransration(m_pos);
+		angle += XM_2PI;
 	}
+	rot.y += angle * 0.01f;
+	SetAngle(rot);
+
+	// 移動ベクトル
+	Vector3 move(0.0f, 0.0f, -0.1f);
+	// 今の角度に合わせて移動ベクトルを回転させる===========
+	float getAngle = GetAngle().y;
+	Matrix rotation = Matrix::CreateRotationY(getAngle);
+	move = Vector3::TransformNormal(move, rotation);
+	// 自機の座標を移動
+	m_pos = m_obj[BODY].GetTransration();
+	m_pos += move;
+	m_obj[BODY].SetTransration(m_pos);
+
+	//if (key.D)
+	//{
+	//	float angleX = m_obj[BODY].GetRotation().x;
+	//	float angleY = m_obj[BODY].GetRotation().y;
+	//	m_obj[BODY].SetRotation(Vector3(angleX, angleY - 0.03f, 0.0f));
+	//}
+
+	//if (key.S)
+	//{
+	//	// 移動ベクトル
+	//	Vector3 move(0, 0, 0.1f);
+	//	// 回転行列
+	//	float angle = m_obj[BODY].GetRotation().y;
+	//	Matrix rotmat = Matrix::CreateRotationY(angle);
+	//	move = Vector3::TransformNormal(move, rotmat);
+	//	// 自機の座標を移動
+	//	m_pos = m_obj[BODY].GetTransration();
+	//	m_pos += move;
+	//	m_obj[BODY].SetTransration(m_pos);
+	//}
 
 	// 動物の上下の動き
 	m_pos.y = (0.5f * sinf(m_cycle)) + 1.0f;
@@ -178,17 +205,12 @@ void Player::Update()
 
 }
 
-void Player::Rebder()
+void Enemy::Rebder()
 {
 	// プレイヤの描画
 	for (std::vector<Obj3D>::iterator it = m_obj.begin(); it != m_obj.end(); it++)
 	{
-		it->Obj3D::Render();
+		it->Render();
 	}
 
-}
-
-void Player::SetKeyboard(DirectX::Keyboard * keyboard)
-{
-	m_keyboard = keyboard;
 }

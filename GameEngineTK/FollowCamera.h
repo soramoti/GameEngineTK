@@ -11,6 +11,8 @@
 #include "Camera.h"
 #include <Keyboard.h>
 
+#include "Player.h"
+
 class FollowCamera : public Camera
 {
 public:
@@ -33,6 +35,9 @@ public:
 	// キーボードをセットする（仮）
 	void SetKeyboard(DirectX::Keyboard* keyboard);
 
+	// プレイヤーのセット
+	void SetPlayer(Player* player) { m_player = player; }
+
 protected:
 	DirectX::SimpleMath::Vector3 m_targetPos;	// 追従対象の座標
 	float m_targetAngle;						// 追従対象の角度
@@ -41,5 +46,8 @@ protected:
 	DirectX::Keyboard* m_keyboard;
 	// キーボードトラッカー（仮）
 	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
+
 	int m_keyflag;
+
+	Player* m_player;
 };
