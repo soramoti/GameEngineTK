@@ -21,6 +21,7 @@ public:
 		LWING,
 		TAIL,
 		STAR,
+		STAR2,
 
 		NUM,
 	};
@@ -33,18 +34,23 @@ public:
 	void Update();
 	void Rebder();
 
+	void fireBullet();
+	void resetBullet();
+
 	// キーボードをセットする（仮）
 	void SetKeyboard(DirectX::Keyboard* keyboard);
 
-	void SetPos(const DirectX::SimpleMath::Vector3& pos) { m_obj[BODY].SetTransration(pos); }
-	void SetAngle(const DirectX::SimpleMath::Vector3& angle) { m_obj[BODY].SetTransration(angle); }
+	void SetPos(const DirectX::SimpleMath::Vector3& pos) { m_obj[BODY].SetTranslation(pos); }
+	void SetAngle(const DirectX::SimpleMath::Vector3& angle) { m_obj[BODY].SetTranslation(angle); }
 
-	const DirectX::SimpleMath::Vector3& GetPos(){ return m_obj[BODY].GetTransration(); }
+	const DirectX::SimpleMath::Vector3& GetPos(){ return m_obj[BODY].GetTranslation(); }
 	const DirectX::SimpleMath::Vector3& GetAngle() { return m_obj[BODY].GetRotation(); }
 
 private:
 	// キーボード（仮）
 	DirectX::Keyboard* m_keyboard;
+	// キーボードトラッカー（仮）
+	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
 
 	std::vector<Obj3D> m_obj;		// プレイヤー
 
@@ -59,5 +65,10 @@ private:
 	DirectX::SimpleMath::Vector3 m_LwingRota;
 	DirectX::SimpleMath::Vector3 m_tailRota;
 
+	DirectX::SimpleMath::Vector3 m_bulletVel;
+
+	bool m_bulletFlag;
+
+	int m_timer;
 };
 

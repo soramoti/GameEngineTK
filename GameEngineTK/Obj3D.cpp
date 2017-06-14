@@ -31,6 +31,9 @@ Obj3D::Obj3D()
 {
 	m_scale = Vector3(1.0f, 1.0f, 1.0f);
 	m_objParent = nullptr;
+
+	// デフォルトではクォータニオンを使わない
+	m_useQuate = false;
 }
 
 void Obj3D::LoadModel(const wchar_t * fileName)
@@ -43,13 +46,21 @@ void Obj3D::Update()
 	// 行列を計算する処理=======
 	// スケーリング行列
 	Matrix scaling = Matrix::CreateScale(m_scale);
-	// 回転行列
-	Matrix rotaZ = Matrix::CreateRotationZ(m_rotation.z);
-	Matrix rotaX = Matrix::CreateRotationX(m_rotation.x);
-	Matrix rotaY = Matrix::CreateRotationY(m_rotation.y);
-	Matrix rotation = rotaZ * rotaX * rotaY;
+	Matrix rotation;
+	if (m_useQuate)
+	{
+		rotation = Matrix::CreateFromQuaternion(m_rotationQ);
+	}
+	else
+	{
+		// オイラー角から回転行列を計算（Z→X→Y）
+		Matrix rotaZ = Matrix::CreateRotationZ(m_rotation.z);
+		Matrix rotaX = Matrix::CreateRotationX(m_rotation.x);
+		Matrix rotaY = Matrix::CreateRotationY(m_rotation.y);
+		rotation = rotaZ * rotaX * rotaY;
+	}
 	// 平行移動行列
-	Matrix transrate = Matrix::CreateTranslation(m_transration);
+	Matrix transrate = Matrix::CreateTranslation(m_translation);
 	// ワールド行列を合成
 	m_world = scaling * rotation * transrate;
 	if (m_objParent)

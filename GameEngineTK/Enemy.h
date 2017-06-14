@@ -33,10 +33,10 @@ public:
 	void Update();
 	void Rebder();
 
-	void SetPos(const DirectX::SimpleMath::Vector3& pos) { m_obj[BODY].SetTransration(pos); }
+	void SetPos(const DirectX::SimpleMath::Vector3& pos) { m_obj[BODY].SetTranslation(pos); }
 	void SetAngle(const DirectX::SimpleMath::Vector3& angle) { m_obj[BODY].SetRotation(angle); }
 
-	const DirectX::SimpleMath::Vector3& GetPos(){return m_obj[BODY].GetTransration();}
+	const DirectX::SimpleMath::Vector3& GetPos(){return m_obj[BODY].GetTranslation();}
 	const DirectX::SimpleMath::Vector3& GetAngle() { return m_obj[BODY].GetRotation(); }
 
 private:
