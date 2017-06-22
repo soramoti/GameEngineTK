@@ -58,7 +58,7 @@ void Player::Initiarize()
 	// 本体の位置の調整
 	m_obj[BODY].SetScale(Vector3(1.0f, 1.0f, 0.7f));
 	m_obj[BODY].SetRotation(Vector3(0.3f, 0.0f, 0.0f));
-	m_obj[BODY].SetTranslation(Vector3(0.0f, 5.0f, 0.0f));
+	m_obj[BODY].SetTranslation(Vector3(0.0f, 0.5f, 0.0f));
 
 	// 親からのずれ===
 	// 左前足
@@ -95,12 +95,22 @@ void Player::Initiarize()
 	m_obj[STAR].SetScale(Vector3(2.0f, 2.0f, 2.0f));
 	m_obj[STAR].SetTranslation(Vector3(0.0f, 1.0f, 0.0f));
 	m_obj[STAR2].SetScale(Vector3(1.5f, 1.5f, 1.5f));
-	m_obj[STAR2].SetTranslation(Vector3(0.0f, 1.3f, -0.5f));
+	m_obj[STAR2].SetRotation(Vector3(0.0f, 0.0f, 0.0f));
+	m_obj[STAR2].SetTranslation(Vector3(0.0f, 0.0f, -1.0f));
 
 	// 回転角の情報を保存
 	m_tailRota = m_obj[TAIL].GetRotation();
 	m_RwingRota = m_obj[RWING].GetRotation();
 	m_LwingRota = m_obj[LWING].GetRotation();
+
+	// 武器のあたり判定ノード設定
+	m_collisionNodeBullet.Initiarize();
+	// 武器パーツにぶら下げる
+	m_collisionNodeBullet.SetParent(&m_obj[STAR2]);
+	// 武器パーツからのオフセット(ずれ）
+	m_collisionNodeBullet.SetTranslation(Vector3(0.0f, 0.0f, 0.0f));
+	// 当たり判定の半径
+	m_collisionNodeBullet.SetLocalRadius(0.2f);
 
 }
 
@@ -161,10 +171,9 @@ void Player::Update()
 		fireBullet();
 	}
 
-
-	// 動物の上下の動き
-	m_pos.y = (0.5f * sinf(m_cycle)) + 1.0f;
-	m_obj[BODY].SetTranslation(m_pos);
+	//// 動物の上下の動き
+	//m_pos.y = (0.5f * sinf(m_cycle)) + 1.0f;
+	//m_obj[BODY].SetTranslation(m_pos);
 
 	// しっぽの回転
 	m_tailRota.z += 0.5f;
@@ -200,14 +209,7 @@ void Player::Update()
 	//	m_obj[STAR2].SetRotation(Vector3(0.0f, m_angle, 0.0f));
 	//}
 
-
-	for (std::vector<Obj3D>::iterator it = m_obj.begin();
-		it != m_obj.end();
-		it++)
-	{
-		it->Obj3D::Update();
-	}
-
+	Calc();
 }
 
 void Player::Rebder()
@@ -218,6 +220,19 @@ void Player::Rebder()
 		it->Obj3D::Render();
 	}
 
+	m_collisionNodeBullet.Render();
+}
+
+void Player::Calc()
+{
+	for (std::vector<Obj3D>::iterator it = m_obj.begin();
+		it != m_obj.end();
+		it++)
+	{
+		it->Obj3D::Update();
+	}
+
+	m_collisionNodeBullet.Updete();
 }
 
 void Player::fireBullet()
@@ -262,7 +277,8 @@ void Player::resetBullet()
 	m_obj[STAR2].SetObjParent(&m_obj[BODY]);
 
 	m_obj[STAR2].SetScale(Vector3(1.5f, 1.5f, 1.5f));
-	m_obj[STAR2].SetTranslation(Vector3(0.0f, 1.3f, -0.5f));
+	m_obj[STAR2].SetRotation(Vector3(0,0,0));
+	m_obj[STAR2].SetTranslation(Vector3(0.0f, 0.0f, -1.0f));
 
 	m_obj[STAR2].Update();
 

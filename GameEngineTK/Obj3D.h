@@ -1,8 +1,6 @@
 //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
 //概要　3Dオブジェクトクラス
 //
-//日付　
-//
 //制作　Mai Kudo
 //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
 
@@ -37,6 +35,9 @@ private:
 	static Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_d3dContext;
 	// エフェクトファクトリ
 	static std::unique_ptr<DirectX::EffectFactory> m_factory;
+	// 読み込み済みモデルコンテナ
+	static std::map<std::wstring, std::unique_ptr<DirectX::Model>> m_modelarray;
+
 public:
 	Obj3D();
 
@@ -45,6 +46,9 @@ public:
 
 	void Update();
 	void Render();
+
+	// オブジェクトのライティングを無効にする
+	void DisableLighting();
 
 	// setter(スケーリング用、回転(オイラー角)用、回転(クォータニオン)用、平行移動用、親オブジェクト用)
 	void SetScale(const DirectX::SimpleMath::Vector3& scale) { m_scale = scale; }
@@ -59,8 +63,8 @@ public:
 	const DirectX::SimpleMath::Matrix& GetWorld() { return m_world; }
 	Obj3D* GetObjParent() { return m_objParent; }
 private:
-	// 3Dモデルのユニークポインタ
-	std::unique_ptr<DirectX::Model> m_model;
+	// モデルデータへのポインタ
+	const DirectX::Model* m_model;	
 	// スケーリング
 	DirectX::SimpleMath::Vector3 m_scale;
 	// 回転(オイラー角)

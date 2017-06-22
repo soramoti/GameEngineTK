@@ -1,3 +1,8 @@
+//ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+//概要　プレイヤークラス
+//
+//制作　Mai Kudo
+//ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
 #pragma once
 
 #include <d3d11.h>
@@ -5,6 +10,7 @@
 #include <Keyboard.h>
 
 #include "Obj3D.h"
+#include "CollisionNode.h"
 
 class Player
 {
@@ -34,8 +40,11 @@ public:
 	void Update();
 	void Rebder();
 
+	void Calc();
+
 	void fireBullet();
 	void resetBullet();
+
 
 	// キーボードをセットする（仮）
 	void SetKeyboard(DirectX::Keyboard* keyboard);
@@ -46,13 +55,14 @@ public:
 	const DirectX::SimpleMath::Vector3& GetPos(){ return m_obj[BODY].GetTranslation(); }
 	const DirectX::SimpleMath::Vector3& GetAngle() { return m_obj[BODY].GetRotation(); }
 
+	const SphereNode& GetCollisionNodeBullet() { return m_collisionNodeBullet; }
 private:
 	// キーボード（仮）
 	DirectX::Keyboard* m_keyboard;
 	// キーボードトラッカー（仮）
 	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
 
-	std::vector<Obj3D> m_obj;		// プレイヤー
+	std::vector<Obj3D> m_obj;
 
 	float m_angle;
 
@@ -70,5 +80,8 @@ private:
 	bool m_bulletFlag;
 
 	int m_timer;
+
+	// 当たり判定球
+	SphereNode m_collisionNodeBullet;
 };
 

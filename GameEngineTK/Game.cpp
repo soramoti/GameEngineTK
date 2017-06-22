@@ -40,7 +40,7 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
-	//srand(static_cast<unsigned int>(time(nullptr)));
+	srand(static_cast<unsigned int>(time(nullptr)));
 
 	m_keyboard = std::make_unique<Keyboard>();
 
@@ -101,9 +101,7 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 		m_enemy[i]->Initiarize();
 	}
 
-
 	m_angle = 0.0f;
-
 }
 
 // Executes the basic game loop.
@@ -147,8 +145,7 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	m_player->Update();
 
 	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_enemy.begin();
-		it != m_enemy.end();
-		it++)
+		it != m_enemy.end(); it++)
 	{
 		 //デバックしやすい
 		Enemy* enemy = it->get();
@@ -156,6 +153,31 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 
 		// 短く書ける
 		//(*it)->Update();
+	}
+
+	// 弾と敵のあたり判定
+	const Sphere& bulletSphere = m_player->GetCollisionNodeBullet();
+
+	// 敵の数だけ処理する
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_enemy.begin();
+		it != m_enemy.end();)
+	{
+		Enemy* enemy = it->get();
+
+		const Sphere& enemySphere = enemy->GetCollisionNode();
+
+		// 二つの玉が当たっていたら
+		if (CheckSphere2Sphere(bulletSphere, enemySphere))
+		{
+			// 敵を消す
+			// eraseした要素の次を指すイテレータを取得
+			it = m_enemy.erase(it);
+		}
+		else
+		{
+			// イテレータを一つ進める
+			it++;
+		}
 	}
 
 	// カメラ

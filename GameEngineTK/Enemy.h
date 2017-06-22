@@ -1,3 +1,8 @@
+//ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+//概要　敵クラス
+//
+//制作　Mai Kudo
+//ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
 #pragma once
 
 #include <d3d11.h>
@@ -5,6 +10,7 @@
 #include <Keyboard.h>
 
 #include "Obj3D.h"
+#include "CollisionNode.h"
 
 class Enemy
 {
@@ -33,12 +39,15 @@ public:
 	void Update();
 	void Rebder();
 
+	void Calc();
+
 	void SetPos(const DirectX::SimpleMath::Vector3& pos) { m_obj[BODY].SetTranslation(pos); }
 	void SetAngle(const DirectX::SimpleMath::Vector3& angle) { m_obj[BODY].SetRotation(angle); }
 
 	const DirectX::SimpleMath::Vector3& GetPos(){return m_obj[BODY].GetTranslation();}
 	const DirectX::SimpleMath::Vector3& GetAngle() { return m_obj[BODY].GetRotation(); }
 
+	const SphereNode& GetCollisionNode() { return m_collisionNode; }
 private:
 	std::vector<Obj3D> m_obj;
 
@@ -55,5 +64,9 @@ private:
 
 	int m_timer;
 	float m_distAngle;
+
+	// 当たり判定球
+	SphereNode m_collisionNode;
+
 };
 

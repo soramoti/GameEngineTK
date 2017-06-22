@@ -3,16 +3,12 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 // 静的メンバ変数の実体====
-// カメラ
 Camera* Obj3D::m_pCamera;		
-// 汎用ステート
 std::unique_ptr<DirectX::CommonStates> Obj3D::m_states;
-// デバイス
 Microsoft::WRL::ComPtr<ID3D11Device> Obj3D::m_d3dDevice;
-// コンテキスト
 Microsoft::WRL::ComPtr<ID3D11DeviceContext> Obj3D::m_d3dContext;
-// エフェクトファクトリ
 std::unique_ptr<DirectX::EffectFactory> Obj3D::m_factory;
+std::map<std::wstring, std::unique_ptr<DirectX::Model>> Obj3D::m_modelarray;
 
 void Obj3D::InitializeStatic(Camera * pCamera, Microsoft::WRL::ComPtr<ID3D11Device> d3dDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext> d3dContext)
 {
@@ -38,7 +34,15 @@ Obj3D::Obj3D()
 
 void Obj3D::LoadModel(const wchar_t * fileName)
 {
-	m_model = Model::CreateFromCMO(m_d3dDevice.Get(), fileName, *m_factory);
+	assert(m_factory);
+
+	// 同じ名前のモデルを読み込み済みでなければひｔ
+	if (m_modelarray.count(fileName) == 0)
+	{
+		// モデルを読み込み、コンテナに登録（キーはファイル名）
+		m_modelarray[fileName] = Model::CreateFromCMO(m_d3dDevice.Get(), fileName, *m_factory);
+	}
+	m_model = m_modelarray[fileName].get();
 }
 
 void Obj3D::Update()
@@ -74,5 +78,43 @@ void Obj3D::Render()
 	if (m_model)
 	{
 		m_model->Draw(m_d3dContext.Get(), *m_states, m_world, m_pCamera->GetVeiw(), m_pCamera->GetProj());
+	}
+}
+
+void Obj3D::DisableLighting()
+{
+	if (m_model)
+	{
+		// モデル内の全メッシュ分回す
+		ModelMesh::Collection::const_iterator it_mesh = m_model->meshes.begin();
+		for (; it_mesh != m_model->meshes.end(); it_mesh++)
+		{
+			ModelMesh* modelmesh = it_mesh->get();
+			assert(modelmesh);
+
+			// メッシュ内の全メッシュパーツ分回す
+			std::vector<std::unique_ptr<ModelMeshPart>>::iterator it_meshpart = modelmesh->meshParts.begin();
+			for (; it_meshpart != modelmesh->meshParts.end(); it_meshpart++)
+			{
+				ModelMeshPart* meshpart = it_meshpart->get();
+				assert(meshpart);
+
+				// メッシュパーツにセットされたエフェクトをBasicEffectとして取得
+				std::shared_ptr<IEffect> ieff = meshpart->effect;
+				BasicEffect* eff = dynamic_cast<BasicEffect*>(ieff.get());
+				if (eff != nullptr)
+				{
+					// 自己発光を最大値に
+					eff->SetEmissiveColor(Vector3(1, 1, 1));
+
+					// エフェクトに含む全ての平行光源分について処理する
+					for (int i = 0; i < BasicEffect::MaxDirectionalLights; i++)
+					{
+						// ライトを無効にする
+						eff->SetLightEnabled(i, false);
+					}
+				}
+			}
+		}
 	}
 }

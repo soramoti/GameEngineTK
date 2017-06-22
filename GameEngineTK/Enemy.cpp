@@ -55,7 +55,7 @@ void Enemy::Initiarize()
 	// 本体の位置の調整
 	m_obj[BODY].SetScale(Vector3(1.0f, 1.0f, 0.7f));
 	m_obj[BODY].SetRotation(Vector3(0.3f, 0.0f, 0.0f));
-	m_obj[BODY].SetTranslation(Vector3(0.0f, 5.0f, 0.0f));
+	m_obj[BODY].SetTranslation(Vector3(0.0f, 0.5f, 0.0f));
 
 	// 親からのずれ===
 	// 左前足
@@ -104,6 +104,16 @@ void Enemy::Initiarize()
 	pos.z = rand() % 10;
 
 	SetPos(pos);
+
+	// 武器のあたり判定ノード設定
+	m_collisionNode.Initiarize();
+	// 武器パーツにぶら下げる
+	m_collisionNode.SetParent(&m_obj[BODY]);
+	// 武器パーツからのオフセット(ずれ）
+	m_collisionNode.SetTranslation(Vector3(0.0f, 0.2f, 0.0f));
+	// 当たり判定の半径
+	m_collisionNode.SetLocalRadius(0.7f);
+
 }
 
 void Enemy::Update()
@@ -175,12 +185,7 @@ void Enemy::Update()
 	m_obj[STAR].SetTranslation(Vector3(cosf(m_cycle), (sinf(m_cycle + m_cycle)) + 0.5f, 0.0f));
 
 
-	for (std::vector<Obj3D>::iterator it = m_obj.begin();
-		it != m_obj.end();
-		it++)
-	{
-		it->Obj3D::Update();
-	}
+	Calc();
 
 }
 
@@ -191,5 +196,19 @@ void Enemy::Rebder()
 	{
 		it->Render();
 	}
+
+	m_collisionNode.Render();
+}
+
+void Enemy::Calc()
+{
+	for (std::vector<Obj3D>::iterator it = m_obj.begin();
+		it != m_obj.end();
+		it++)
+	{
+		it->Obj3D::Update();
+	}
+
+	m_collisionNode.Updete();
 
 }
