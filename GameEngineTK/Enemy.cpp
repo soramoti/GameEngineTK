@@ -155,7 +155,7 @@ void Enemy::Update()
 	SetAngle(rot);
 
 	// 移動ベクトル
-	Vector3 move(0.0f, 0.0f, -0.1f);
+	Vector3 move(0.0f, 0.0f, -0.05f);
 	// 今の角度に合わせて移動ベクトルを回転させる===========
 	float getAngle = GetAngle().y;
 	Matrix rotation = Matrix::CreateRotationY(getAngle);

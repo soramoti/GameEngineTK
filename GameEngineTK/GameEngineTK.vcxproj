@@ -168,6 +168,7 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="FollowCamera.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="ModelEffect.h" />
     <ClInclude Include="Obj3D.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="FollowCamera.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ModelEffect.cpp" />
     <ClCompile Include="Obj3D.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -207,12 +209,15 @@
   </ItemGroup>
   <ItemGroup>
     <MeshContentTask Include="Assets\body.FBX" />
+    <MeshContentTask Include="Assets\clear.FBX" />
     <MeshContentTask Include="Assets\engin.FBX" />
     <MeshContentTask Include="Assets\foot.FBX" />
     <MeshContentTask Include="Assets\ground1m.FBX" />
     <MeshContentTask Include="Assets\ground200m.FBX" />
     <MeshContentTask Include="Assets\head.FBX" />
     <MeshContentTask Include="Assets\robbot.FBX" />
+    <MeshContentTask Include="Assets\score.FBX" />
+    <MeshContentTask Include="Assets\shadow.FBX" />
     <MeshContentTask Include="Assets\skyDome.FBX" />
     <MeshContentTask Include="Assets\sphere.FBX" />
     <MeshContentTask Include="Assets\SphereNode.FBX" />

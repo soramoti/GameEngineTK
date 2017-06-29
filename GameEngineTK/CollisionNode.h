@@ -19,6 +19,14 @@ public:
 	void SetParent(Obj3D* parent);
 	// 親からのオフセットをセット
 	void SetTranslation(const DirectX::SimpleMath::Vector3& trans) { m_translation = trans; }
+
+	// デバッグ表示のON/OFFを設定
+	static void SetDebugVisible(bool flag) { m_DebugVisible = flag; }
+	// デバッグ表示のON/OFFを取得
+	static bool GetDebugVisible(void) { return m_DebugVisible; }
+private:
+	// デバッグ表示のON/OFFフラグ
+	static bool m_DebugVisible;
 protected:
 	// デバック表示オブジェクト
 	Obj3D m_obj;

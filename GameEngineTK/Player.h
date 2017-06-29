@@ -55,6 +55,8 @@ public:
 	const DirectX::SimpleMath::Vector3& GetPos(){ return m_obj[BODY].GetTranslation(); }
 	const DirectX::SimpleMath::Vector3& GetAngle() { return m_obj[BODY].GetRotation(); }
 
+	void SetClearFlag() { m_clearFlag = true; }
+
 	const SphereNode& GetCollisionNodeBullet() { return m_collisionNodeBullet; }
 private:
 	// キーボード（仮）
@@ -63,6 +65,10 @@ private:
 	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
 
 	std::vector<Obj3D> m_obj;
+
+	Obj3D m_clearPanel;
+
+	bool m_clearFlag;
 
 	float m_angle;
 

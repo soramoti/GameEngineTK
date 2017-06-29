@@ -9,18 +9,40 @@ Microsoft::WRL::ComPtr<ID3D11Device> Obj3D::m_d3dDevice;
 Microsoft::WRL::ComPtr<ID3D11DeviceContext> Obj3D::m_d3dContext;
 std::unique_ptr<DirectX::EffectFactory> Obj3D::m_factory;
 std::map<std::wstring, std::unique_ptr<DirectX::Model>> Obj3D::m_modelarray;
+ID3D11BlendState* Obj3D::s_pBlendStateSubtract;
 
-void Obj3D::InitializeStatic(Camera * pCamera, Microsoft::WRL::ComPtr<ID3D11Device> d3dDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext> d3dContext)
+void Obj3D::StaticInitialize(const Defs& def)
 {
-	m_pCamera = pCamera;
-	m_d3dDevice = d3dDevice;
-	m_d3dContext = d3dContext;
-	//　ステートの設定
-	m_states = std::make_unique<CommonStates>(m_d3dDevice.Get());
-	// エフェクトファクトリの設定
-	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
+	SetDevice(def.pDevice);
+	SetDeviceContext(def.pDeviceContext);
+	SetCamera(def.pCamera);
+
+	// エフェクトファクトリ生成
+	m_factory = std::make_unique<EffectFactory>(def.pDevice.Get());
 	m_factory->SetDirectory(L"Resources");
 
+	// 汎用ステート生成
+	m_states = std::make_unique<CommonStates>(def.pDevice.Get());
+
+	// 減算描画用のブレンドステートを作成
+	D3D11_BLEND_DESC desc;
+	desc.AlphaToCoverageEnable = false;
+	desc.IndependentBlendEnable = false;
+	desc.RenderTarget[0].BlendEnable = true;
+	desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
+	desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_REV_SUBTRACT;
+	desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	HRESULT ret = m_d3dDevice->CreateBlendState(&desc, &s_pBlendStateSubtract);
+}
+
+void Obj3D::SetSubtractive()
+{
+	// 減算描画を設定
+	m_d3dContext->OMSetBlendState(s_pBlendStateSubtract, nullptr, 0xffffff);
 }
 
 Obj3D::Obj3D()

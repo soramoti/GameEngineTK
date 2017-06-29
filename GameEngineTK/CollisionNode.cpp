@@ -4,6 +4,9 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+// デバッグ表示のON/OFFフラグの実体
+bool CollisionNode::m_DebugVisible = false;
+
 // CollisionNodeのメンバ関数
 void CollisionNode::SetParent(Obj3D * parent)
 {
@@ -45,5 +48,9 @@ void SphereNode::Updete()
 
 void SphereNode::Render()
 {
-	m_obj.Render();
+	// デバッグ表示がONなら
+	if (CollisionNode::GetDebugVisible())
+	{
+		m_obj.Render();
+	}
 }

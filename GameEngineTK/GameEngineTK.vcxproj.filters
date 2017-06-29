@@ -44,6 +44,9 @@
       <Filter>ヘッダファイル</Filter>
     </ClInclude>
     <ClInclude Include="CollisionNode.h" />
+    <ClInclude Include="ModelEffect.h">
+      <Filter>ヘッダファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Enemy.cpp">
@@ -77,6 +80,9 @@
       <Filter>ソースファイル</Filter>
     </ClCompile>
     <ClCompile Include="CollisionNode.cpp" />
+    <ClCompile Include="ModelEffect.cpp">
+      <Filter>ソースファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -132,6 +138,15 @@
       <Filter>Assets</Filter>
     </MeshContentTask>
     <MeshContentTask Include="Assets\SphereNode.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\shadow.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\score.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\clear.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
   </ItemGroup>

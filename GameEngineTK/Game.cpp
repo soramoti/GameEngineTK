@@ -48,9 +48,15 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 	m_camera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
 	m_camera->SetKeyboard(m_keyboard.get());
 
-	// 3Dオブジェくトクラスの静的メンバの初期化
-	Obj3D::InitializeStatic(m_camera.get(), m_d3dDevice, m_d3dContext);
+	// Obj3Dの静的な初期化
+	{
+		Obj3D::Defs defs;
+		defs.pDevice = m_d3dDevice;
+		defs.pDeviceContext = m_d3dContext;
+		defs.pCamera = m_camera.get();
 
+		Obj3D::StaticInitialize(defs);
+	}
 
 	// テクチャ関連 =========
 	//m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
@@ -93,7 +99,6 @@ void Game::Initialize(HWND window, int width, int height)	// 初期化
 	m_camera->SetPlayer(m_player.get());
 
 	// 敵を生成
-	int enemyNum = rand() % 10 + 1;
 	m_enemy.resize(enemyNum);
 	for (int i = 0; i < enemyNum; i++)
 	{
@@ -129,6 +134,7 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 
 	// キーボードの状態を取得する
 	Keyboard::State key = m_keyboard->GetState();
+	m_keyboardTracker.Update(key);
 
 	// ワールド行列の計算 =======
 	m_angle += 0.05f;
@@ -143,6 +149,11 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 	//}
 
 	m_player->Update();
+
+	if (m_keyboardTracker.IsKeyPressed(Keyboard::D1))
+	{
+		CollisionNode::SetDebugVisible(!CollisionNode::GetDebugVisible());
+	}
 
 	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_enemy.begin();
 		it != m_enemy.end(); it++)
@@ -169,15 +180,32 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 		// 二つの玉が当たっていたら
 		if (CheckSphere2Sphere(bulletSphere, enemySphere))
 		{
+			ModelEffectManager::getInstance()->Entry(
+				L"Resources/score.cmo",	// モデルファイル
+				30,	// 寿命フレーム数
+				enemy->GetPos(),	// ワールド座標
+				Vector3(0, 0, 0),	// 速度
+				Vector3(0, 0, 0),	// 加速度
+				Vector3(0, 0, 0),	// 回転角（初期）
+				Vector3(0, 0, 0),	// 回転角（最終）
+				Vector3(0, 0, 0),	// スケール（初期）
+				Vector3(6, 6, 6)	// スケール（最終）
+				);
 			// 敵を消す
 			// eraseした要素の次を指すイテレータを取得
 			it = m_enemy.erase(it);
+
 		}
 		else
 		{
 			// イテレータを一つ進める
 			it++;
 		}
+	}
+
+	if (m_enemy.size() == 0)
+	{
+		m_player->SetClearFlag();
 	}
 
 	// カメラ
@@ -188,6 +216,7 @@ void Game::Update(DX::StepTimer const& timer)	// 更新
 
 	m_objSkyDome.Update();
 
+	ModelEffectManager::getInstance()->Update();
 }
 
 // Draws the scene.
@@ -226,7 +255,9 @@ void Game::Render()	// 描画
 
 	// 天球、地面モデルの描画 ==========
 	m_objSkyDome.Render();
+	m_objSkyDome.DisableLighting();
 	m_objGround.Render();
+	m_objGround.DisableLighting();
 	//for (int i = 0; i < 20; i++)
 	//{
 	//	m_objTeapot[i].Render();
@@ -244,6 +275,7 @@ void Game::Render()	// 描画
 		//(*it)->Rebder();
 	}
 
+	ModelEffectManager::getInstance()->Draw();
 
 	// テクスチャ、ポリゴンモデルの描画 ==========
 	//m_batch->Begin();

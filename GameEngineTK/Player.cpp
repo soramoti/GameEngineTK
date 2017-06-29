@@ -19,6 +19,7 @@ Player::Player()
 
 	m_keyboard = nullptr;
 
+	m_clearFlag = false;
 }
 
 
@@ -42,6 +43,8 @@ void Player::Initiarize()
 	m_obj[TAIL].LoadModel(L"Resources/tail.cmo");
 	m_obj[STAR].LoadModel(L"Resources/star.cmo");
 	m_obj[STAR2].LoadModel(L"Resources/star.cmo");
+
+	m_clearPanel.LoadModel(L"Resources/clear.cmo");
 
 	// eŽqŠÖŒW‚ð‚Â‚¯‚é
 	m_obj[FLFOOT].SetObjParent(&m_obj[BODY]);
@@ -96,7 +99,7 @@ void Player::Initiarize()
 	m_obj[STAR].SetTranslation(Vector3(0.0f, 1.0f, 0.0f));
 	m_obj[STAR2].SetScale(Vector3(1.5f, 1.5f, 1.5f));
 	m_obj[STAR2].SetRotation(Vector3(0.0f, 0.0f, 0.0f));
-	m_obj[STAR2].SetTranslation(Vector3(0.0f, 0.0f, -1.0f));
+	m_obj[STAR2].SetTranslation(Vector3(0.0f, 1.3f, -1.0f));
 
 	// ‰ñ“]Šp‚Ìî•ñ‚ð•Û‘¶
 	m_tailRota = m_obj[TAIL].GetRotation();
@@ -220,6 +223,15 @@ void Player::Rebder()
 		it->Obj3D::Render();
 	}
 
+	if (m_clearFlag)
+	{
+		m_clearPanel.SetObjParent(&m_obj[BODY]);
+		m_clearPanel.SetScale(Vector3(0.3f, 0.3f, 0.3f));
+		m_clearPanel.SetRotation(Vector3(-0.2f, 0.0f, 0.0f));
+		m_clearPanel.SetTranslation(Vector3(0.0f, 3.0f, 0.0f));
+		m_clearPanel.DisableLighting();
+		m_clearPanel.Render();
+	}
 	m_collisionNodeBullet.Render();
 }
 
@@ -231,6 +243,8 @@ void Player::Calc()
 	{
 		it->Obj3D::Update();
 	}
+
+	m_clearPanel.Update();
 
 	m_collisionNodeBullet.Updete();
 }
@@ -258,7 +272,7 @@ void Player::fireBullet()
 	m_obj[STAR2].SetRotationQ(rotation);
 	m_obj[STAR2].SetTranslation(translation);
 
-	m_bulletVel = Vector3(0.0f, 0.0f, -0.1f);
+	m_bulletVel = Vector3(0.0f,-0.05f, -0.15f);
 
 	m_bulletVel = Vector3::Transform(m_bulletVel, rotation);
 
@@ -278,7 +292,7 @@ void Player::resetBullet()
 
 	m_obj[STAR2].SetScale(Vector3(1.5f, 1.5f, 1.5f));
 	m_obj[STAR2].SetRotation(Vector3(0,0,0));
-	m_obj[STAR2].SetTranslation(Vector3(0.0f, 0.0f, -1.0f));
+	m_obj[STAR2].SetTranslation(Vector3(0.0f, 1.3f, -1.0f));
 
 	m_obj[STAR2].Update();
 

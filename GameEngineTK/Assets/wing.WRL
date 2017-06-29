@@ -21,9 +21,9 @@
        Shape {
         appearance Appearance {
          material Material {
-          diffuseColor 0.225000 0.540000 0.900000
+          diffuseColor 0.810000 0.855000 0.900000
           ambientIntensity 0.316228
-          specularColor 0.187500 0.450000 0.750000
+          specularColor 0.675000 0.712500 0.750000
           shininess 0.200000
          }
         }

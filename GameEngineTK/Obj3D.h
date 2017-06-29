@@ -22,8 +22,33 @@ class Obj3D
 {
 	// 静的メンバ
 public:
-	// 静的メンバの初期化
-	static void InitializeStatic(Camera* pCamera, Microsoft::WRL::ComPtr<ID3D11Device> d3dDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext> d3dContext);
+	// 設定
+	struct Defs
+	{
+		Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> pDeviceContext;
+		Camera* pCamera;
+
+		Defs()
+		{
+			pDevice = nullptr;
+			pDeviceContext = nullptr;
+			pCamera = nullptr;
+		}
+	};
+	// 静的メンバ関数
+	// 静的初期化
+	static void StaticInitialize(const Defs& def);
+	// デバイスのsetter
+	static void SetDevice(Microsoft::WRL::ComPtr<ID3D11Device> pDevice) { m_d3dDevice = pDevice; }
+	// デバイスコンテキストのsetter
+	static void SetDeviceContext(Microsoft::WRL::ComPtr<ID3D11DeviceContext> pDeviceContext) { m_d3dContext = pDeviceContext; }
+	// カメラのsetter
+	static void SetCamera(Camera* pCamera) { m_pCamera = pCamera; }
+
+	static Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetDeviceContext() { return m_d3dContext; }
+	// 減算描画設定をセット
+	static void SetSubtractive();
 private:
 	// カメラ
 	static Camera* m_pCamera;
@@ -37,7 +62,8 @@ private:
 	static std::unique_ptr<DirectX::EffectFactory> m_factory;
 	// 読み込み済みモデルコンテナ
 	static std::map<std::wstring, std::unique_ptr<DirectX::Model>> m_modelarray;
-
+	
+	static ID3D11BlendState* s_pBlendStateSubtract;
 public:
 	Obj3D();
 

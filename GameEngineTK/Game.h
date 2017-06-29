@@ -16,6 +16,8 @@
 
 #include <Model.h>
 
+#include "ModelEffect.h"
+
 #include "DebugCamera.h"
 #include "FollowCamera.h"
 
@@ -28,6 +30,7 @@
 class Game
 {
 public:
+	const int enemyNum = 5;
 
     Game();
 
@@ -81,6 +84,7 @@ private:
 
 	//　キーボードの変数
 	std::unique_ptr <DirectX::Keyboard> m_keyboard;
+	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
 
 	// テクスチャ関連の変数
 	//std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>> m_batch;
@@ -110,4 +114,5 @@ private:
 	int x[20], z[20];
 
 	std::unique_ptr<FollowCamera> m_camera;
+
 };
